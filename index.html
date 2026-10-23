@@ -1,0 +1,1327 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Inside the detector viewer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #0b1320;
+      color: #e9f0f7;
+      font: 15px system-ui;
+    }
+    header {
+      padding: 22px 28px;
+      border-bottom: 1px solid #29374a;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h1 {
+      font-size: 23px;
+      font-weight: 550;
+      margin: 0 auto 0 0;
+    }
+    button,
+    select {
+      font: inherit;
+      background: #1b2b40;
+      color: inherit;
+      border: 1px solid #4b6078;
+      border-radius: 5px;
+      padding: 8px 13px;
+      cursor: pointer;
+    }
+    button:first-of-type {
+      background: #157b88;
+    }
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(460px, 1fr);
+      height: calc(100vh - 86px);
+    }
+    .stage {
+      position: relative;
+      min-height: 400px;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    .hint {
+      position: absolute;
+      bottom: 22px;
+      left: 25px;
+      color: #9eafc3;
+      font-size: 13px;
+      pointer-events: none;
+    }
+    aside {
+      border-left: 1px solid #29374a;
+      padding: 24px;
+      overflow: auto;
+      background: #111d2c;
+    }
+    h2 {
+      font-size: 16px;
+      margin: 0 0 15px;
+      font-weight: 500;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .meta select {
+      max-width: 260px;
+    }
+    .code {
+      margin: 0;
+      font:
+        13px/1.85 Menlo,
+        Consolas,
+        monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .line {
+      display: block;
+      padding: 0 8px;
+      border-left: 3px solid transparent;
+      color: #acbdd0;
+    }
+    .line.active {
+      background: #24444b;
+      border-color: #7be3d2;
+      color: white;
+    }
+    .n {
+      color: #637b95;
+      display: inline-block;
+      width: 25px;
+      user-select: none;
+    }
+    #state {
+      font:
+        13px/1.8 Menlo,
+        Consolas,
+        monospace;
+      color: #b9d4e5;
+      white-space: pre-wrap;
+      margin: 18px 0 0;
+    }
+    footer {
+      border-top: 1px solid #29374a;
+      margin-top: 20px;
+      padding-top: 14px;
+      color: #93a7be;
+      font-size: 12px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #69d6cc;
+      margin: 16px 0;
+    }
+    #operation {
+      color: #79e0cf;
+    }
+    details {
+      margin-top: 18px;
+      color: #a8bbcf;
+    }
+    summary {
+      cursor: pointer;
+    }
+    #full {
+      font: 12px/1.5 monospace;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .stage {
+        height: 55vh;
+      }
+      aside {
+        border-left: 0;
+      }
+      header {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+  <style>
+    .loadform {
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      right: 25px;
+      padding: 18px;
+      background: #152337ee;
+      border: 1px solid #405670;
+      border-radius: 6px;
+    }
+    .loadform label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .loadform input {
+      font: 14px monospace;
+      background: #0b1524;
+      border: 1px solid #566b80;
+      color: white;
+      padding: 10px;
+      width: calc(100% - 90px);
+    }
+    .loadform button {
+      margin-left: 8px;
+    }
+    #stop {
+      background: transparent;
+      font-size: 13px;
+    }
+    #log {
+      font: 11px/1.5 monospace;
+      white-space: pre-wrap;
+      color: #8cabc0;
+      max-height: 220px;
+      overflow: auto;
+    }
+    .codeFile {
+      font:
+        11px Menlo,
+        Consolas,
+        monospace;
+      color: #79e0cf;
+      margin: 12px 0 8px;
+    }
+    .codeFile:empty {
+      display: none;
+    }
+    .code .n {
+      width: 40px;
+    }
+    .code .line {
+      padding-left: 0;
+    }
+    #placementPanel {
+      margin: 0 0 18px;
+      border: 1px solid #405670;
+      border-radius: 6px;
+      padding: 14px;
+      background: #152337;
+    }
+    #placementPanel h3 {
+      font-size: 14px;
+      color: #ffcc77;
+      margin: 0 0 10px;
+      overflow-wrap: anywhere;
+    }
+    #placementPath {
+      font:
+        11px/1.6 Menlo,
+        monospace;
+      color: #93a7be;
+      overflow-wrap: anywhere;
+      margin-bottom: 10px;
+    }
+    .placements {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .placements h4 {
+      font-size: 12px;
+      color: #79e0cf;
+      margin: 0 0 8px;
+    }
+    .placements pre {
+      font:
+        11px/1.7 Menlo,
+        monospace;
+      margin: 4px 0 10px;
+      white-space: pre-wrap;
+    }
+    .placements small,
+    #placementParent {
+      font-size: 12px;
+      color: #afc7dc;
+    }
+    #placementParent {
+      overflow-wrap: anywhere;
+      margin: 0 0 12px;
+    }
+    #placementKind {
+      font-size: 11px;
+      color: #93a7be;
+      margin: 0 0 8px;
+    }
+  </style>
+  <header>
+    <h1>Inside the detector viewer</h1>
+    <button id="unwrap" disabled>Unwrap</button
+    ><button id="pause" disabled>Pause</button
+    ><button id="step" disabled>Step</button
+    ><select id="pace" aria-label="Playback speed">
+      <option value="0.8">Watch · 0.8 s / step</option>
+      <option value="1.6">Slower · 1.6 s / step</option>
+      <option value="0.05">Fast</option></select
+    ><button id="finish" disabled>Finish loading</button
+    ><button id="stop" disabled>Stop</button
+    ><button id="reload" disabled>Reload</button><button id="quit">Quit</button>
+  </header>
+  <main>
+    <div class="stage">
+      <canvas
+        id="scene"
+        aria-label="All six detector rings and ShowerMax"
+      ></canvas>
+      <form id="loadform" class="loadform">
+        <label for="root">Where is your remoll directory?</label
+        ><input id="root" placeholder="/path/to/remoll" required /><button
+          id="load"
+        >
+          Load
+        </button>
+      </form>
+      <div id="hint" class="hint">Choose remoll to load its GDML geometry.</div>
+    </div>
+    <aside>
+      <section id="hitsPanel">
+        <div style="display: flex; gap: 8px; align-items: center">
+          <button id="chooseFile" disabled>Choose ROOT file…</button
+          ><button id="analyze" disabled>Analyze</button
+          ><select id="metric" aria-label="Color tiles by">
+            <option value="counts">Hits</option>
+            <option value="rates" disabled>Rate</option>
+          </select>
+        </div>
+        <p
+          id="filename"
+          style="font-size: 12px; color: #9eafc3; overflow-wrap: anywhere"
+        >
+          No ROOT file selected
+        </p>
+        <p id="hitStatus" style="font-size: 13px"></p>
+        <div id="hitCodeFile" class="codeFile"></div>
+        <pre id="hitCode" class="code"></pre>
+        <div
+          id="colorbar"
+          hidden
+          style="
+            height: 7px;
+            margin-top: 15px;
+            background: linear-gradient(
+              90deg,
+              #440154,
+              #3b528b,
+              #21918c,
+              #5ec962,
+              #fde725
+            );
+          "
+        ></div>
+        <p id="hitScale" style="font-size: 12px; color: #9eafc3"></p>
+      </section>
+      <div class="meta">
+        <h2 id="operation">Load geometry</h2>
+        <select id="tile" aria-label="Inspect a tile" hidden></select>
+      </div>
+      <div id="unwrapControls" hidden>
+        <div>Unwrap <span id="percent">0%</span></div>
+        <input
+          id="progress"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0"
+          aria-label="Unwrap progress"
+        />
+      </div>
+      <section id="placementPanel" hidden aria-label="Loaded placement">
+        <p id="placementKind"></p>
+        <div id="placementPath"></div>
+        <h3 id="placementName"></h3>
+        <p id="placementParent"></p>
+        <div class="placements">
+          <div>
+            <h4>Relative to parent</h4>
+            <small>Position [mm]</small>
+            <pre id="localPosition"></pre>
+            <small>Rotation matrix</small>
+            <pre id="localRotation"></pre>
+          </div>
+          <div>
+            <h4>In world coordinates</h4>
+            <small>Position [mm]</small>
+            <pre id="worldPosition"></pre>
+            <small>Rotation matrix</small>
+            <pre id="worldRotation"></pre>
+          </div>
+        </div>
+      </section>
+      <div id="codeFile" class="codeFile"></div>
+      <pre id="code" class="code"></pre>
+      <pre id="state"></pre>
+      <footer id="foot">
+        Geant4 reads geometry/mollerMother.gdml and its referenced files.<br />No
+        events are simulated.
+      </footer>
+      <details id="nativeLog">
+        <summary>Geant4 output</summary>
+        <pre id="log"></pre>
+      </details>
+      <details id="drawingCode" hidden>
+        <summary>Setup and drawing code</summary>
+        <pre id="full"></pre>
+      </details>
+    </aside>
+  </main>
+  <script id="app">
+    function mapHitData(rows, data, metric) {
+      const values = data[metric],
+        planeSeen = rows.some(
+          (r) =>
+            r.system === "showermax" &&
+            r.plane_detector &&
+            data.counts[r.plane_detector] > 0,
+        ),
+        matched = new Set();
+      const mapped = rows.map((r) => {
+        if (r.system === "showermax" && (!planeSeen || !r.plane_detector))
+          return null;
+        const ids =
+          r.system === "showermax"
+            ? [r.plane_detector]
+            : r.gdml_detectors || [];
+        ids.forEach((id) => matched.add(String(id)));
+        return ids.reduce((sum, id) => sum + (values[id] || 0), 0);
+      });
+      return {
+        mapped,
+        planeSeen,
+        excluded: Object.entries(values).reduce(
+          (sum, [id, v]) => sum + (matched.has(id) ? 0 : v),
+          0,
+        ),
+      };
+    }
+    function startViewer(GEOMETRY) {
+      const $ = (id) => document.getElementById(id),
+        TAU = 2 * Math.PI;
+      const wrap = (a) => ((((a + Math.PI) % TAU) + TAU) % TAU) - Math.PI;
+      const world = ([x, y, z]) => [x / 1000, y / 1000, (z - 22850) / 1000];
+      const rows = GEOMETRY.rows,
+        meshes = GEOMETRY.meshes;
+      const centers = rows.map(() => [0, 0, 0]),
+        counts = rows.map(() => 0);
+      for (const m of meshes) {
+        world(m.center).forEach((v, j) => (centers[m.index][j] += v));
+        counts[m.index]++;
+      }
+      centers.forEach((c, i) => c.forEach((v, j) => (c[j] = v / counts[i])));
+      const groups = [...new Set(rows.map((r) => r.system))].map((system) => {
+        const p = meshes
+          .filter((m) => rows[m.index].system === system)
+          .flatMap((m) => m.faces.flat().map(world));
+        const radius = p.map((v) => Math.hypot(v[0], v[1])),
+          z = p.map((v) => v[2]);
+        const r0 = Math.min(...radius),
+          r1 = Math.max(...radius);
+        return {
+          system,
+          r0,
+          r1,
+          radius: (r0 + r1) / 2,
+          zmid: (Math.min(...z) + Math.max(...z)) / 2,
+        };
+      });
+      let y = groups.reduce((s, g) => s + g.r1 - g.r0 + 0.35, 0) / 2 - 0.175;
+      for (const g of groups) {
+        g.y = y - (g.r1 - g.r0) / 2;
+        y -= g.r1 - g.r0 + 0.35;
+      }
+      const angles = centers
+        .filter((_, i) => rows[i].system === "ring5")
+        .map((c) => (Math.atan2(c[1], c[0]) + TAU) % TAU)
+        .sort((a, b) => a - b);
+      const seam = (angles[0] + angles.at(-1) - TAU) / 2;
+      class Tile {
+        constructor(index) {
+          this.index = index;
+          this.center = centers[index];
+          this.group = groups.find((g) => g.system === rows[index].system);
+        }
+        *calculate(point, t) {
+          const [x, y, z] = this.center,
+            g = this.group;
+          const phi = Math.atan2(y, x);
+          yield { phi };
+          const theta = (((phi - seam) % TAU) + TAU) % TAU;
+          yield { theta };
+          const target = [
+            g.radius * (theta - Math.PI),
+            g.y - (Math.hypot(x, y) - g.radius),
+            z - g.zmid,
+          ];
+          yield { target };
+          const d = point.map((v, j) => v - this.center[j]);
+          yield { d };
+          const a = wrap(-phi - Math.PI / 2) * t,
+            c = Math.cos(a),
+            s = Math.sin(a);
+          const rotated = [c * d[0] - s * d[1], s * d[0] + c * d[1], d[2]];
+          yield { a, rotated };
+          const result = rotated.map(
+            (v, j) => v + (1 - t) * this.center[j] + t * target[j],
+          );
+          yield { result };
+          return result;
+        }
+        transform(point, t) {
+          const run = this.calculate(point, t);
+          let next;
+          do {
+            next = run.next();
+          } while (!next.done);
+          return next.value;
+        }
+      }
+      const tiles = rows.map((_, i) => new Tile(i));
+      const faces = meshes.flatMap((m) =>
+        m.faces.map((f) => ({ index: m.index, points: f.map(world) })),
+      );
+      let hitValues = null,
+        hitMax = 0,
+        hitMin = 0;
+      let selected = Math.max(
+          0,
+          rows.findIndex((r) => r.detector === 150252),
+        ),
+        t = 0,
+        target = 1,
+        playing = false,
+        trace = null,
+        phase = -1,
+        values = {},
+        timer = 0;
+      let yaw = 0.6,
+        pitch = 0.28,
+        drag = null,
+        hitFaces = [];
+      const cv = $("scene"),
+        ctx = cv.getContext("2d");
+      const palette = [
+        "#6497bd",
+        "#55aab1",
+        "#7fbfa5",
+        "#b3c78c",
+        "#d5ba7f",
+        "#d68e78",
+        "#a393cb",
+      ];
+      const heatStops = [
+        [68, 1, 84],
+        [59, 82, 139],
+        [33, 145, 140],
+        [94, 201, 98],
+        [253, 231, 37],
+      ];
+      function heat(n) {
+        if (!n) return "#3b4859";
+        const v =
+            hitMax === hitMin
+              ? 4
+              : Math.max(
+                  0,
+                  Math.min(
+                    4,
+                    (4 * (Math.log(n) - Math.log(hitMin))) /
+                      (Math.log(hitMax) - Math.log(hitMin)),
+                  ),
+                ),
+          k = Math.min(3, Math.floor(v)),
+          a = v - k;
+        return (
+          "rgb(" +
+          heatStops[k]
+            .map((x, j) => Math.round(x * (1 - a) + heatStops[k + 1][j] * a))
+            .join(",") +
+          ")"
+        );
+      }
+      const name = (r) =>
+        r.system === "showermax" ? "ShowerMax" : `Ring ${r.system.slice(4)}`;
+      $("placementPanel").hidden = true;
+      $("codeFile").textContent = "Tile.calculate · index.html";
+      $("tile").innerHTML = "";
+      $("code").innerHTML = "";
+      $("operation").textContent = "Ready";
+      $("log").hidden = true;
+      $("loadform").hidden = true;
+      $("tile").hidden = false;
+      $("unwrapControls").hidden = false;
+      $("drawingCode").hidden = false;
+      $("nativeLog").hidden = true;
+      $("finish").hidden = true;
+      $("unwrap").disabled = false;
+      $("step").disabled = false;
+      $("foot").textContent =
+        "Loaded from " +
+        GEOMETRY.source +
+        ". Row spacing is for display. Coordinates: metres.";
+      $("hint").textContent =
+        `Drag to rotate · click a tile to inspect · ${rows.filter((r) => r.system !== "showermax").length} main tiles + ${rows.filter((r) => r.system === "showermax").length} ShowerMax modules`;
+      for (const g of groups) {
+        const o = document.createElement("optgroup");
+        o.label = name(rows.find((r) => r.system === g.system));
+        rows.forEach((r, i) => {
+          if (r.system === g.system) {
+            const option = new Option(`${r.detector} · ${r.region}`, i);
+            o.append(option);
+          }
+        });
+        $("tile").append(o);
+      }
+      $("tile").value = selected;
+      const source = Tile.prototype.calculate.toString().split("\n");
+      source.forEach((line, i) => {
+        const el = document.createElement("span");
+        el.className = "line";
+        const n = document.createElement("span");
+        n.className = "n";
+        n.textContent = i + 1;
+        el.append(n, document.createTextNode(line));
+        $("code").append(el);
+      });
+      const yieldLines = source
+        .map((s, i) => (s.includes("yield") ? i : -1))
+        .filter((i) => i >= 0);
+      const f = (v) =>
+        Array.isArray(v)
+          ? "[" + v.map(f).join(", ") + "]"
+          : Number(v).toFixed(4);
+      function showState() {
+        $("state").textContent =
+          (hitValues
+            ? `${$("metric").value === "rates" ? "Rate [Hz]" : "Recorded hits"}: ${hitValues[selected] === null ? "Unavailable — no ShowerMax virtual plane hits" : hitValues[selected].toLocaleString(undefined, { maximumSignificantDigits: 6 })}\n`
+            : "") +
+          `${rows[selected].detector} · ${name(rows[selected])}\nHit DetNo: ${rows[selected].system === "showermax" ? (rows[selected].plane_detector ?? "Unavailable") : rows[selected].detector}\n` +
+          (rows[selected].system === "showermax"
+            ? `Mesh DetNo: ${rows[selected].gdml_detectors.join(", ")} (geometry only)\n`
+            : "") +
+          `center = ${f(tiles[selected].center)}\nt = ${t.toFixed(2)}\n` +
+          Object.entries(values)
+            .map(([k, v]) => `${k} = ${f(v)}`)
+            .join("\n");
+        [...$("code").children].forEach((e, i) =>
+          e.classList.toggle("active", i === yieldLines[phase]),
+        );
+        $("progress").value = t;
+        $("percent").textContent = Math.round(t * 100) + "%";
+        $("unwrap").textContent = t === 1 ? "Wrap" : "Unwrap";
+      }
+      function beginTrace() {
+        values = {};
+        phase = -1;
+        trace = tiles[selected].calculate(
+          faces.find((f) => f.index === selected).points[0],
+          t,
+        );
+      }
+      function step() {
+        if (!trace) {
+          t = Math.max(0, Math.min(1, t + (target ? 0.02 : -0.02)));
+          beginTrace();
+        }
+        const next = trace.next();
+        if (next.done) {
+          trace = null;
+          if (t === target) {
+            playing = false;
+            $("pause").disabled = true;
+            $("operation").textContent = "Complete";
+          }
+          return;
+        }
+        phase++;
+        Object.assign(values, next.value);
+        $("operation").textContent = [
+          "Azimuth",
+          "Seam angle",
+          "Strip position",
+          "Local vertex",
+          "Rotate tile",
+          "Move tile",
+        ][phase];
+        if (phase === 5) draw();
+        showState();
+      }
+      let disposed = false,
+        frame = 0;
+      function tick(time) {
+        if (disposed) return;
+        if (playing && time - timer > Number($("pace").value) * 150) {
+          timer = time;
+          step();
+        }
+        frame = requestAnimationFrame(tick);
+      }
+      function camera([x, y, z]) {
+        const a = yaw * (1 - t),
+          p = pitch * (1 - t) + 0.6 * t;
+        const xx = Math.cos(a) * x + Math.sin(a) * z,
+          zz = -Math.sin(a) * x + Math.cos(a) * z;
+        return [
+          xx,
+          Math.cos(p) * y - Math.sin(p) * zz,
+          Math.sin(p) * y + Math.cos(p) * zz,
+        ];
+      }
+      function draw() {
+        const W = cv.clientWidth,
+          H = cv.clientHeight,
+          dpr = devicePixelRatio || 1;
+        cv.width = W * dpr;
+        cv.height = H * dpr;
+        ctx.scale(dpr, dpr);
+        const fs = faces.map((f) => ({
+          ...f,
+          p: f.points.map((p) => camera(tiles[f.index].transform(p, t))),
+        }));
+        const ps = fs.flatMap((f) => f.p),
+          xs = ps.map((p) => p[0]),
+          ys = ps.map((p) => p[1]);
+        const x0 = Math.min(...xs),
+          x1 = Math.max(...xs),
+          y0 = Math.min(...ys),
+          y1 = Math.max(...ys),
+          scale = Math.min((W - 100) / (x1 - x0), (H - 120) / (y1 - y0));
+        const project = (p) => [
+          W / 2 + (p[0] - (x0 + x1) / 2) * scale,
+          H / 2 - (p[1] - (y0 + y1) / 2) * scale,
+        ];
+        fs.sort(
+          (a, b) =>
+            a.p.reduce((s, p) => s + p[2], 0) / a.p.length -
+            b.p.reduce((s, p) => s + p[2], 0) / b.p.length,
+        );
+        hitFaces = [];
+        ctx.fillStyle = "#0c1725";
+        ctx.fillRect(0, 0, W, H);
+        for (const face of fs) {
+          const p = face.p.map(project),
+            i = face.index,
+            g = groups.findIndex((g) => g.system === rows[i].system);
+          ctx.beginPath();
+          p.forEach((v, j) => (j ? ctx.lineTo(...v) : ctx.moveTo(...v)));
+          ctx.closePath();
+          ctx.fillStyle = hitValues
+            ? heat(hitValues[i])
+            : i === selected
+              ? "#ffcc77"
+              : palette[g];
+          ctx.globalAlpha = hitValues ? 1 : i === selected ? 1 : 0.58;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          ctx.strokeStyle = i === selected ? "#fff2c9" : "#afc7dc55";
+          ctx.lineWidth = i === selected ? 1.4 : 0.45;
+          ctx.stroke();
+          hitFaces.push({ index: i, p });
+        }
+        const point = project(
+          camera(
+            tiles[selected].transform(
+              faces.find((f) => f.index === selected).points[0],
+              t,
+            ),
+          ),
+        );
+        ctx.beginPath();
+        ctx.arc(...point, 4, 0, TAU);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+        if (t > 0.9) {
+          ctx.font = "12px system-ui";
+          ctx.fillStyle = "#c1cddc";
+          for (const g of groups) {
+            const p = project(camera([-Math.PI * g.radius, g.y, 0]));
+            ctx.fillText(
+              g.system === "showermax"
+                ? "ShowerMax"
+                : "Ring " + g.system.slice(4),
+              p[0],
+              p[1] - 12,
+            );
+          }
+        }
+      }
+      function select(i) {
+        selected = i;
+        $("tile").value = i;
+        beginTrace();
+        showState();
+        draw();
+      }
+      $("tile").onchange = () => select(Number($("tile").value));
+      $("unwrap").onclick = () => {
+        target = t === 1 ? 0 : 1;
+        playing = true;
+        $("pause").disabled = false;
+        $("pause").textContent = "Pause";
+      };
+      $("pause").onclick = () => {
+        playing = !playing;
+        $("pause").textContent = playing ? "Pause" : "Resume";
+      };
+      $("step").onclick = () => {
+        playing = false;
+        $("pause").textContent = "Resume";
+        $("pause").disabled = false;
+        if (t === 1 && !trace) target = 0;
+        step();
+      };
+      $("progress").oninput = (e) => {
+        playing = false;
+        t = +e.target.value;
+        target = t === 1 ? 0 : 1;
+        beginTrace();
+        showState();
+        draw();
+        $("pause").textContent = "Resume";
+      };
+      cv.onpointerdown = (e) => {
+        drag = {
+          x: e.clientX,
+          y: e.clientY,
+          startX: e.clientX,
+          startY: e.clientY,
+        };
+        cv.setPointerCapture(e.pointerId);
+      };
+      cv.onpointermove = (e) => {
+        if (drag) {
+          yaw += (e.clientX - drag.x) * 0.008;
+          pitch += (e.clientY - drag.y) * 0.008;
+          drag.x = e.clientX;
+          drag.y = e.clientY;
+          draw();
+        }
+      };
+      cv.onpointerup = (e) => {
+        if (
+          drag &&
+          Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < 4
+        ) {
+          const r = cv.getBoundingClientRect(),
+            x = e.clientX - r.left,
+            y = e.clientY - r.top;
+          for (const f of [...hitFaces].reverse()) {
+            let inside = false;
+            for (let i = 0, j = f.p.length - 1; i < f.p.length; j = i++) {
+              let a = f.p[i],
+                b = f.p[j];
+              if (
+                a[1] > y !== b[1] > y &&
+                x < ((b[0] - a[0]) * (y - a[1])) / (b[1] - a[1]) + a[0]
+              )
+                inside = !inside;
+            }
+            if (inside) {
+              select(f.index);
+              break;
+            }
+          }
+        }
+        drag = null;
+      };
+      const observer = new ResizeObserver(draw);
+      observer.observe(cv.parentElement);
+      beginTrace();
+      showState();
+      draw();
+      frame = requestAnimationFrame(tick);
+      $("full").textContent = document.getElementById("app").textContent;
+      window.walkthrough = { tiles, rows, faces, groups };
+      const playback = { pause: $("pause").onclick, step: $("step").onclick };
+      return {
+        playback,
+        setHits(data) {
+          $("colorbar").hidden = !data;
+          if (!data) {
+            hitValues = null;
+            window.walkthrough.hitValues = null;
+            $("hitScale").textContent = "";
+            showState();
+            draw();
+            return;
+          }
+          const rateMode = $("metric").value === "rates",
+            c = rateMode ? data.rates : data.counts;
+          if (!c) return;
+          const mapping = mapHitData(rows, data, rateMode ? "rates" : "counts");
+          hitValues = mapping.mapped;
+          hitMax = Math.max(0, ...hitValues);
+          hitMin = Math.min(...hitValues.filter((n) => n > 0));
+          const excluded = mapping.excluded;
+          $("hitScale").textContent =
+            `${rateMode ? "Rate [Hz] · sum of stored rate per hit" : "Stored hits"} · log color · ${hitMax ? hitMin.toLocaleString(undefined, { maximumSignificantDigits: 4 }) : 0}–${hitMax.toLocaleString(undefined, { maximumSignificantDigits: 4 })}. No cuts${rateMode ? " or extra normalization" : ""}. Gray: no recorded contribution. ${excluded.toLocaleString(undefined, { maximumSignificantDigits: 5 })}${rateMode ? " Hz" : " hits"} outside this mapping. ShowerMax: ${mapping.planeSeen ? "virtual planes only" : "unavailable — no virtual plane hits"}. Quartz layer hits excluded.`;
+          window.walkthrough.hitValues = hitValues;
+          showState();
+          draw();
+        },
+        dispose() {
+          disposed = true;
+          playing = false;
+          cancelAnimationFrame(frame);
+          observer.disconnect();
+          cv.onpointerdown = cv.onpointermove = cv.onpointerup = null;
+          window.walkthrough = null;
+        },
+      };
+    }
+    const el = (id) => document.getElementById(id);
+    let viewer = null,
+      currentRun = 0,
+      previewCount = 0,
+      preview = [],
+      activePlacement = null,
+      previewRevision = -1,
+      actionPending = false,
+      quitting = false,
+      hitBusy = false,
+      selectedFile = "",
+      lastHits = "",
+      selectionPending = false;
+    async function api(path, data) {
+      const response = await fetch(
+        path,
+        data === undefined
+          ? {}
+          : {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            },
+      );
+      const value = await response.json();
+      if (!response.ok) throw Error(value.error || "Request failed");
+      return value;
+    }
+    function resetView() {
+      if (viewer) viewer.dispose();
+      viewer = null;
+      hitBusy = false;
+      lastHits = "";
+      el("hitStatus").textContent = "";
+      el("hitCode").textContent = "";
+      el("hitScale").textContent = "";
+      el("colorbar").hidden = true;
+      el("chooseFile").disabled = true;
+      el("analyze").disabled = true;
+      el("finish").textContent = "Finish loading";
+      preview = [];
+      previewCount = 0;
+      activePlacement = null;
+      previewRevision = -1;
+      el("placementPanel").hidden = true;
+      el("loadform").hidden = false;
+      el("tile").hidden = true;
+      el("unwrapControls").hidden = true;
+      el("drawingCode").hidden = true;
+      el("nativeLog").hidden = false;
+      el("log").hidden = false;
+      el("finish").hidden = false;
+      el("unwrap").disabled = true;
+      el("unwrap").textContent = "Unwrap";
+      el("pause").textContent = "Pause";
+      el("pause").onclick = () => control("/pause");
+      el("step").onclick = () => control("/step");
+      el("code").textContent = "";
+      el("codeFile").textContent = "";
+      el("hitCodeFile").textContent = "";
+      el("state").textContent = "";
+      el("foot").textContent =
+        "After parsing: inspect loaded detector placements and their parents. Pause or Step to follow.";
+      drawLoading();
+    }
+    function showCode(id, s) {
+      const box = el(id),
+        loc = s.code_location || {};
+      box.replaceChildren();
+      el(id + "File").textContent = loc.file || "";
+      if (!s.code) return;
+      s.code.split("\n").forEach((text, i) => {
+        const line = document.createElement("span");
+        line.className = "line";
+        const n = document.createElement("span");
+        n.className = "n";
+        n.textContent = loc.lines?.[i] ?? "";
+        line.append(n, document.createTextNode(text || " "));
+        box.append(line);
+      });
+    }
+    function showPlacement(p) {
+      activePlacement = p || null;
+      el("placementPanel").hidden = !p;
+      if (!p) return;
+      el("placementKind").textContent = p.quartz
+        ? "Detector quartz · loaded placement"
+        : "Parent assembly · loaded placement";
+      el("placementPath").textContent = p.path.join(" › ");
+      el("placementName").textContent = p.volume;
+      el("placementParent").textContent =
+        "Parent: " + (p.parent || "World root") + " · Copy " + p.copy;
+      const n = (v) =>
+        Math.abs(v) < 0.00005 ? "0" : Number(v.toFixed(4)).toString();
+      for (const [id, key] of [
+        ["localPosition", "local_position"],
+        ["worldPosition", "world_position"],
+      ])
+        el(id).textContent = "[" + p[key].map(n).join(", ") + "]";
+      for (const [id, key] of [
+        ["localRotation", "local_rotation"],
+        ["worldRotation", "world_rotation"],
+      ])
+        el(id).textContent = p[key]
+          .map(
+            (row) => "[ " + row.map((v) => n(v).padStart(7)).join(" ") + " ]",
+          )
+          .join("\n");
+    }
+    function drawLoading() {
+      const cv = el("scene"),
+        ctx = cv.getContext("2d"),
+        W = cv.clientWidth,
+        H = cv.clientHeight,
+        dpr = devicePixelRatio || 1;
+      cv.width = W * dpr;
+      cv.height = H * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.fillStyle = "#0c1725";
+      ctx.fillRect(0, 0, W, H);
+      const project = (p) => {
+        let [x, y, z] = [p[0] / 1000, p[1] / 1000, (p[2] - 22850) / 1000];
+        let a = 0.6,
+          b = 0.28,
+          xx = Math.cos(a) * x + Math.sin(a) * z,
+          zz = -Math.sin(a) * x + Math.cos(a) * z;
+        return [
+          xx,
+          Math.cos(b) * y - Math.sin(b) * zz,
+          Math.sin(b) * y + Math.cos(b) * zz,
+        ];
+      };
+      const faces = preview.flatMap((v) =>
+        v.faces.map((f) => ({
+          active:
+            !!activePlacement &&
+            v.name === activePlacement.logical &&
+            v.center.every(
+              (x, i) => Math.abs(x - activePlacement.world_position[i]) < 1e-6,
+            ),
+          sm: v.name.startsWith("logic_quartz"),
+          p: f.map((i) => project(v.vertices[i])),
+        })),
+      );
+      faces.sort(
+        (a, b) =>
+          a.p.reduce((s, v) => s + v[2], 0) / a.p.length -
+          b.p.reduce((s, v) => s + v[2], 0) / b.p.length,
+      );
+      const scale = Math.min((W - 100) / 3.5, (H - 240) / 3.5);
+      for (const f of faces) {
+        ctx.beginPath();
+        f.p.forEach((v, i) => {
+          const p = [W / 2 + v[0] * scale, H / 2 + 60 - v[1] * scale];
+          i ? ctx.lineTo(...p) : ctx.moveTo(...p);
+        });
+        ctx.closePath();
+        ctx.fillStyle = f.active ? "#ffcc77" : f.sm ? "#a393cb44" : "#69beb544";
+        ctx.fill();
+        ctx.strokeStyle = f.active ? "#fff2c9" : "#b4d6e944";
+        ctx.lineWidth = f.active ? 2 : 0.5;
+        ctx.stroke();
+      }
+      if (activePlacement?.quartz) {
+        const p = project(activePlacement.world_position);
+        ctx.beginPath();
+        ctx.arc(
+          W / 2 + p[0] * scale,
+          H / 2 + 60 - p[1] * scale,
+          5,
+          0,
+          Math.PI * 2,
+        );
+        ctx.strokeStyle = "#ffcc77";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+    const labels = {
+      choose: "Load geometry",
+      locate: "Find GDML",
+      compile: "Build reader",
+      parse: "Read GDML",
+      parsed: "Walk loaded detector hierarchy",
+      volume: "Visit parent assembly",
+      placed: "Display quartz mesh",
+      placement: "Resolve placement",
+      mesh: "Make polyhedron",
+      vertices: "Transform vertices",
+      faces: "Read faces",
+      check: "Check placements",
+      package: "Build browser data",
+      ready: "Ready",
+      error: "Could not load",
+      stopping: "Stopping…",
+      stopped: "Stopped",
+      done: "Export complete",
+    };
+    async function poll() {
+      if (quitting) return;
+      try {
+        const s = await api("/status");
+        if (actionPending) return;
+        if (s.run !== currentRun) {
+          if (s.kind !== "hits") resetView();
+          else {
+            lastHits = "";
+            if (viewer) viewer.setHits(null);
+          }
+          currentRun = s.run;
+        }
+        if (!el("root").value) el("root").value = s.root || s.default_root;
+        el("loadform").hidden = s.busy;
+        el("load").disabled = s.busy;
+        el("root").disabled = s.busy;
+        el("reload").disabled = !s.run || s.stage === "stopping";
+        el("stop").disabled = !s.busy && !viewer;
+        el("chooseFile").disabled = !viewer || s.busy;
+        el("analyze").disabled = !viewer || s.busy || !selectedFile;
+        if (s.kind === "hits") {
+          if (selectionPending) return;
+          if (!viewer) {
+            const d = await api("/geometry");
+            if (d.data) viewer = startViewer(d.data);
+          }
+          if (!viewer) return;
+          el("metric").options[1].disabled = !s.hits || s.hits.rates === null;
+          if (
+            el("metric").value === "rates" &&
+            el("metric").options[1].disabled
+          )
+            el("metric").value = "counts";
+          const stamp = JSON.stringify(s.hits) + "/" + el("metric").value;
+          if (stamp !== lastHits) {
+            viewer.setHits(s.hits);
+            lastHits = stamp;
+          }
+          if (s.hits && !selectedFile) {
+            selectedFile = s.hits.path;
+            el("filename").textContent = selectedFile;
+          }
+          showCode("hitCode", s);
+          el("hitStatus").textContent =
+            s.stage === "error"
+              ? s.detail
+              : s.hits
+                ? `${s.hits.events.toLocaleString()} / ${s.hits.total_events.toLocaleString()} events · ${s.hits.records.toLocaleString()} stored hits · ${s.hits.complete ? "Complete" : s.busy ? (s.paused ? "Paused" : "Reading") : "Partial — stopped"}`
+                : s.detail;
+          if (s.hits?.rate_error)
+            el("hitStatus").textContent +=
+              " · Rate unavailable: " + s.hits.rate_error;
+          el("finish").hidden = !s.busy;
+          el("finish").disabled = !s.busy;
+          el("finish").textContent = "Finish analysis";
+          el("stop").disabled = !s.busy;
+          if (s.busy) {
+            hitBusy = true;
+            el("pause").onclick = () => control("/pause");
+            el("step").onclick = () => control("/step");
+            el("pause").disabled = false;
+            el("step").disabled = false;
+            el("pause").textContent = s.paused ? "Resume" : "Pause";
+            el("unwrap").disabled = true;
+          } else if (hitBusy) {
+            hitBusy = false;
+            el("pause").onclick = viewer.playback.pause;
+            el("step").onclick = viewer.playback.step;
+            el("pause").disabled = true;
+            el("step").disabled = false;
+            el("unwrap").disabled = false;
+          }
+          return;
+        }
+        if (viewer && s.stage === "ready") return;
+        if (viewer) resetView();
+        el("operation").textContent =
+          (s.paused && s.busy ? "Paused · " : "") +
+          (labels[s.stage] || s.stage);
+        showPlacement(s.placement);
+        el("state").textContent =
+          s.placement && s.stage !== "vertices" ? "" : s.detail;
+        showCode("code", s);
+        el("log").textContent = s.log.slice(-10).join("\n");
+        el("pause").disabled = !s.busy || s.stage === "stopping";
+        el("step").disabled = el("pause").disabled;
+        el("finish").disabled = el("pause").disabled;
+        el("pause").textContent = s.paused ? "Resume" : "Pause";
+        el("hint").textContent = s.mesh_count
+          ? `${s.mesh_count} quartz meshes loaded`
+          : "Choose remoll to load its GDML geometry.";
+        if (s.mesh_count !== previewCount) {
+          const d = await api("/preview");
+          if (d.run !== s.run || actionPending) return;
+          preview = d.data || [];
+          previewCount = preview.length;
+          drawLoading();
+        }
+        if (s.revision !== previewRevision) {
+          previewRevision = s.revision;
+          drawLoading();
+        }
+        if (s.stage === "ready") {
+          const d = await api("/geometry");
+          if (d.run !== s.run || actionPending) return;
+          viewer = startViewer(d.data);
+          el("stop").disabled = false;
+        }
+      } catch (e) {
+        el("state").textContent =
+          "Connection lost. Start the app with python3 run.py.";
+      } finally {
+        if (!quitting) setTimeout(poll, 150);
+      }
+    }
+    async function control(path, data = {}) {
+      try {
+        await api(path, data);
+      } catch (e) {
+        el("state").textContent = e.message;
+      }
+    }
+    async function stopLoad() {
+      await api("/stop", {});
+      for (let n = 0; n < 100; n++) {
+        const s = await api("/status");
+        if (!s.busy) return;
+        await new Promise((r) => setTimeout(r, 50));
+      }
+      throw Error("The reader is still stopping. Try again shortly.");
+    }
+    async function begin(restart) {
+      if (actionPending) return;
+      actionPending = true;
+      el("load").disabled = true;
+      el("reload").disabled = true;
+      try {
+        if (restart) await stopLoad();
+        resetView();
+        const d = await api("/load", {
+          root: el("root").value,
+          delay: Number(el("pace").value),
+        });
+        currentRun = d.run;
+      } catch (e) {
+        el("state").textContent = e.message;
+      } finally {
+        actionPending = false;
+      }
+    }
+    el("metric").onchange = () => {
+      lastHits = "";
+    };
+    el("chooseFile").onclick = async () => {
+      el("chooseFile").disabled = true;
+      actionPending = true;
+      try {
+        const d = await api("/choose-root", {});
+        if (d.path) {
+          selectedFile = d.path;
+          selectionPending = true;
+          if (viewer) viewer.setHits(null);
+          el("hitCode").textContent = "";
+          el("filename").textContent = d.path;
+          el("hitStatus").textContent = "Selected. Click Analyze.";
+        }
+      } catch (e) {
+        el("hitStatus").textContent = e.message;
+      } finally {
+        actionPending = false;
+        el("chooseFile").disabled = false;
+        el("analyze").disabled = !selectedFile;
+      }
+    };
+    el("analyze").onclick = async () => {
+      if (actionPending || !selectedFile) return;
+      actionPending = true;
+      el("hitStatus").textContent = "Reading…";
+      if (viewer) viewer.setHits(null);
+      lastHits = "";
+      try {
+        await api("/analyze", {
+          path: selectedFile,
+          delay: Number(el("pace").value),
+        });
+        selectionPending = false;
+      } catch (e) {
+        el("hitStatus").textContent = e.message;
+      } finally {
+        actionPending = false;
+      }
+    };
+    el("loadform").onsubmit = (e) => {
+      e.preventDefault();
+      begin(false);
+    };
+    el("reload").onclick = () => begin(true);
+    el("stop").onclick = async () => {
+      if (actionPending) return;
+      actionPending = true;
+      try {
+        const s = await api("/status");
+        await stopLoad();
+        if (s.kind !== "hits") resetView();
+      } catch (e) {
+        el("state").textContent = e.message;
+      } finally {
+        actionPending = false;
+      }
+    };
+    el("finish").onclick = () => control("/finish");
+    el("pace").onchange = () => {
+      if (!viewer || hitBusy)
+        control("/pace", { delay: Number(el("pace").value) });
+    };
+    el("quit").onclick = async () => {
+      if (!confirm("Close the local app?")) return;
+      quitting = true;
+      if (viewer) viewer.dispose();
+      await api("/quit", {});
+      document.body.innerHTML =
+        '<p style="padding:35px">App closed. Run python3 run.py to reopen.</p>';
+    };
+    new ResizeObserver(() => {
+      if (!viewer) drawLoading();
+    }).observe(el("scene").parentElement);
+    resetView();
+    poll();
+  </script>
+</html>
