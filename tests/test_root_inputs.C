@@ -7,10 +7,10 @@ void test_root_inputs(const char* scratch){
         t.fFilenameSize=name.size()+1;t.fFilename=new char[t.fFilenameSize];std::strcpy(t.fFilename,name.c_str());
         t.fBufferSize=content.size()+1;t.fBuffer=new char[t.fBufferSize];std::strcpy(t.fBuffer,content.c_str());
     };
-    auto make=[&](const char* filename,const std::string& mode,const std::string& phi,int seed,const char* fieldHash="",const char* extraSD=""){
+    auto make=[&](const char* filename,const std::string& mode,const std::string& phi,int seed,const char* fieldHash="",const char* extraSD="",long long thrown=2){
         TFile file((dir/filename).string().c_str(),"RECREATE");TTree tree("T","Synthetic metadata test");
         double rate=1;tree.Branch("rate",&rate);tree.Fill();tree.Fill();tree.Write();
-        remollRunData data;data.fNthrown=2;data.fSeed=seed;data.fGitInfo="synthetic-test-source";
+        remollRunData data;data.fNthrown=thrown;data.fSeed=seed;data.fGitInfo="synthetic-test-source";
         std::string macro="/remoll/evgen/set moller\n/remoll/beamcurr 65 uA\n/remoll/evgen/phmax "+phi+"\n/remoll/SD/enable_all\n";
         fs::path here=fs::absolute(fs::path(__FILE__)).parent_path().parent_path();
         fs::path channels=here/"data/channels.json";
@@ -59,6 +59,23 @@ void test_root_inputs(const char* scratch){
     if(transport_identity(fieldRun,"/remoll/rasx 2 mm\n"+transportMacro)==original)throw std::runtime_error("Changed beam settings accepted");
     if(transport_identity(fieldRun,"/remoll/field/scale map.txt 2\n"+transportMacro)==original)throw std::runtime_error("Ordered field commands lost");
     if(transport_identity(fieldRun,"/remoll/seed 99\n/remoll/beamcurr 1 uA\n/remoll/evgen/set elastic\n"+transportMacro)!=original)throw std::runtime_error("Generator/current/seed incorrectly change transport identity");
+    const std::string proposal="/remoll/bias/beamp/mode mixture\n/remoll/bias/beamp/min 0.08 GeV\n/remoll/bias/beamp/max 11 GeV\n/remoll/bias/beamp/physicalFraction 0.2\n/remoll/interval 9000\n";
+    if(transport_identity(fieldRun,proposal+transportMacro)!=original)throw std::runtime_error("Proposal/reporting settings incorrectly change transport identity");
+    if(transport_identity(fieldRun,"/remoll/bias/unknown 1\n"+transportMacro)==original)throw std::runtime_error("Unknown bias command silently ignored");
+    auto included=transport_identity(fieldRun,"/control/execute macros/target/LH2.mac\n"+transportMacro);
+    if(included==transport_identity(fieldRun,"/control/execute macros/sieve/sieve_out.mac\n"+transportMacro))throw std::runtime_error("Different nested macro calls accepted");
+    if(transport_identity(fieldRun,"/remoll/geometry/relative_position USsieve (200,0,0)\n"+transportMacro)==original)throw std::runtime_error("Geometry move ignored");
+    Input moved=one;moved.transport="moved";moved.transportDetails={"/remoll/geometry/relative_position USsieve (200,0,0)"};
+    rejected=false;try{check_transport(one,moved);}catch(const std::exception& e){rejected=std::string(e.what()).find("USsieve (200,0,0)")!=std::string::npos;}
+    if(!rejected)throw std::runtime_error("Transport error hides exact differing record");
+    make("neyman.root","boundaryhits","180 deg",9,"","/remoll/evgen/transportNeymanEnable true\n",100);
+    rejected=false;try{inspect(dir/"neyman.root",{110110},false,{});}catch(const std::exception& e){rejected=std::string(e.what()).find("stratified MC")!=std::string::npos;}
+    if(!rejected)throw std::runtime_error("Neyman diagnosis hidden by count mismatch");
+    make("incomplete.root","boundaryhits","180 deg",10,"","",100);
+    rejected=false;try{inspect(dir/"incomplete.root",{110110},false,{});}catch(const std::exception& e){auto msg=std::string(e.what());rejected=msg.find("run_data=100, T=2")!=std::string::npos;}
+    if(!rejected)throw std::runtime_error("Count mismatch missing generated/stored counts");
+    make("comment.root","boundaryhits","180 deg",11,"","# Neyman was not used\n");
+    inspect(dir/"comment.root",{110110},false,{});
     different=one;different.transport="different";rejected=false;
     try{check_transport(one,different);}catch(const std::exception&){rejected=true;}
     if(!rejected)throw std::runtime_error("Incompatible transport accepted");

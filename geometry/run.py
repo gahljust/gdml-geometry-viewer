@@ -546,8 +546,19 @@ def load_hit_file(paths, cut='1', binning=None, response=None):
                 raise ValueError(f'{path.name}: ' + (errors[-1] if errors else f'ROOT could not read the file. See {log_path}.')) from None
             part = json.loads(receipt.read_text())
             if response:
-                if any(g['part']['transport'] != part['transport'] for g in groups.values()):
-                    raise ValueError('Incompatible transport: source, geometry, magnetic fields or beam/physics settings differ. Analyze separately.')
+                for group in groups.values():
+                    previous = group['part']
+                    if previous['transport'] == part['transport']:
+                        continue
+                    left, right = previous.get('transport_details', []), part.get('transport_details', [])
+                    difference = next(((left[i] if i < len(left) else '<no corresponding record>',
+                                        right[i] if i < len(right) else '<no corresponding record>')
+                                       for i in range(max(len(left), len(right)))
+                                       if i >= len(left) or i >= len(right) or left[i] != right[i]),
+                                      ('unknown', 'unknown'))
+                    detail = ('Differing included macro calls cannot be assumed equivalent.'
+                              if any(item.startswith('/control/') for item in difference) else 'Analyze separately.')
+                    raise ValueError(f'Incompatible transport in {path.name}: [{difference[0]}] versus [{difference[1]}]. {detail}')
                 cohort=part['normalization']
                 if any(g['part']['generator']==part['generator'] and k!=cohort for k,g in groups.items()):
                     raise ValueError('The same generator has different run settings or geometry. Analyze those files separately.')

@@ -98,13 +98,17 @@ void load_hits(const char* input = nullptr, const char* output = nullptr, const 
 
         const auto events = tree->GetEntries();
         std::string weighting="hits",normalization="",generator="",transport="";double current=0,signalTotal=0;Long64_t seed=0,unsupportedPE=0;
+        std::vector<std::string> transportDetails;
         std::map<int,double> detectorSignal,particleSignal;
 #ifdef MOLLER_WEIGHTED_HITS
         weighting="pe";
         auto* rate=tree->GetLeaf("rate");
         auto* run=file->Get<remollRunData>("run_data");
         if(!rate)throw std::runtime_error("PE rate needs ROOT field rate.");
-        if(!run||run->fNthrown!=events||events<1)throw std::runtime_error("PE rate/current needs run_data with the generated event count. Hit counts remain available.");
+        if(!run)throw std::runtime_error("PE rate/current needs run_data. Hit counts remain available.");
+        std::string macroText=run->fMacro.fBuffer?run->fMacro.fBuffer:"";
+        root_deconv::check_sampling(*file,tree,input,macroText);
+        if(run->fNthrown!=events||events<1)throw std::runtime_error("Generated/stored event count mismatch: run_data="+std::to_string(run->fNthrown)+", T="+std::to_string(events)+". PE normalization is not inferred; hit counts remain available.");
         std::map<std::string,std::string> settings;std::istringstream macro(run->fMacro.fBuffer?run->fMacro.fBuffer:"");std::string line;int runs=0;
         while(std::getline(macro,line)){
             line=line.substr(0,line.find('#'));std::istringstream words(line);std::string command,value;words>>command;
@@ -113,8 +117,6 @@ void load_hits(const char* input = nullptr, const char* output = nullptr, const 
             std::getline(words,value);if(command.rfind("/remoll/",0)==0)settings[command]=root_deconv::trim(value);
         }
         if(runs!=1||settings["/remoll/evgen/set"].empty())throw std::runtime_error("PE rate needs a saved generator and one effective beamOn; no normalization is guessed.");
-        std::string macroText=run->fMacro.fBuffer?run->fMacro.fBuffer:"";
-        root_deconv::check_sampling(*file,tree,input,macroText);
         const auto gdml=root_deconv::saved_geometry(*run);
         std::map<std::string,std::string> modelGeometry;
         std::istringstream modelHashes(root_deconv::text(std::filesystem::path(__FILE__).parent_path().parent_path()/"data/geometry.md5"));
@@ -126,9 +128,10 @@ void load_hits(const char* input = nullptr, const char* output = nullptr, const 
         if(!(current>0)||!std::isfinite(current))throw std::runtime_error("PE rate/current needs the saved beam current.");
         seed=run->fSeed;generator=settings["/remoll/evgen/set"];
         transport=root_deconv::transport_identity(*run,macroText);
+        transportDetails=root_deconv::transport_details(*run,macroText);
         std::string runIdentity=transport;
         for(const auto& g:gdml)runIdentity+=g.first+g.second;
-        for(const auto& entry:settings)if(entry.first!="/remoll/beamcurr"&&entry.first!="/remoll/seed")runIdentity+=entry.first+"="+entry.second+"\n";
+        for(const auto& entry:settings)if(entry.first!="/remoll/beamcurr"&&entry.first!="/remoll/seed"&&entry.first!="/remoll/interval"&&!root_deconv::proposal_setting(entry.first))runIdentity+=entry.first+"="+entry.second+"\n";
         normalization=root_deconv::digest_text(runIdentity);
         root_deconv::MainModel mainPE(gSystem->Getenv("MOLLER_MAIN_PE"));
         auto showerPE=portable_deconv::load(gSystem->Getenv("MOLLER_SM_PE"));
@@ -371,7 +374,10 @@ void load_hits(const char* input = nullptr, const char* output = nullptr, const 
         out<<"},\"histograms2d\":{";first=true;for(auto& joint:joints){if(!first)out<<',';first=false;joint->write(out);}
         out<<"},\"particles_available\":"<<(pid?"true":"false")<<",\"invalid_particles\":"<<invalidParticles<<",\"particles\":{";
         first=true;for(const auto& item:particles){if(!first)out<<',';first=false;out<<'"'<<item.first<<"\":"<<item.second;}
-        out<<"},\"weighting\":"<<viewer_json::quote(weighting)<<",\"transport\":"<<viewer_json::quote(transport)<<",\"normalization\":"<<viewer_json::quote(normalization)<<",\"generator\":"<<viewer_json::quote(generator)<<",\"seed\":"<<seed<<",\"signal_total\":"<<signalTotal<<",\"unsupported_pe\":"<<unsupportedPE<<",\"detector_signal\":{";
+        out<<"},\"transport_details\":[";
+        for(size_t i=0;i<transportDetails.size();++i){if(i)out<<",";out<<viewer_json::quote(transportDetails[i]);}
+        out<<"]";
+        out<<",\"weighting\":"<<viewer_json::quote(weighting)<<",\"transport\":"<<viewer_json::quote(transport)<<",\"normalization\":"<<viewer_json::quote(normalization)<<",\"generator\":"<<viewer_json::quote(generator)<<",\"seed\":"<<seed<<",\"signal_total\":"<<signalTotal<<",\"unsupported_pe\":"<<unsupportedPE<<",\"detector_signal\":{";
         first=true;for(auto item:detectorSignal){if(!first)out<<',';first=false;out<<'"'<<item.first<<"\":"<<item.second;}out<<"},\"particle_signal\":{";
         first=true;for(auto item:particleSignal){if(!first)out<<',';first=false;out<<'"'<<item.first<<"\":"<<item.second;}out<<"}}\n";
         out.close();

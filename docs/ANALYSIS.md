@@ -31,7 +31,12 @@ root of its diagonal entry in `M⁻¹`. Finite simulation uncertainty propagates
 through H separately.
 
 Deconvolution requires compatible run metadata and detector coverage.
-Missing information is reported, not treated as zero.
+Missing information is reported, not treated as zero. Compatibility compares saved
+source, geometry, field hashes and ordered transport commands, including macro
+calls. Included macro contents are not saved in ROOT; matching calls alone cannot
+verify later edits to those files. Progress printing and known rate-corrected
+beam-momentum proposal settings do not change transport identity. Neyman/fixed-quota
+samples remain unsupported: their MC uncertainty requires stratified statistics.
 
 The same steps can run separately, without the browser:
 

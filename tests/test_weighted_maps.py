@@ -27,7 +27,7 @@ def main():
   maker=base/'Make.C'
   maker.write_text('#include '+json.dumps(str(HERE/'Deconvolution.C'))+'\n'+r'''
 void Make(){
- for(int seed=1;seed<=10;++seed){
+ for(int seed=1;seed<=13;++seed){
   std::string path=std::string(gSystem->Getenv("FIXTURE_DIR"))+"/"+std::to_string(seed)+".root";
   TFile f(path.c_str(),"RECREATE");TTree t("T","known weighted hits");
   int n=0,det[4],pid[4];double rate,x[4],y[4],z[4],xl[4],yl[4],zl[4],px[4],py[4],pz[4],k[4],e[4];
@@ -40,8 +40,11 @@ void Make(){
   n=1;rate=5;t.Fill();n=0;rate=0;t.Fill();t.Write();
   remollRunData d;d.fNthrown=3;d.fSeed=seed;d.fGitInfo="known-rate-test";
   std::string macro="/remoll/evgen/set moller\n/remoll/beamcurr 65 uA\n/run/beamOn 3\n";
-  if(seed>=8)macro="/remoll/evgen/set elastic\n/remoll/beamcurr 65 uA\n"+std::string(seed==9?"/remoll/rasx 2 mm\n":"")+"/run/beamOn 3\n";
+  if(seed>=8&&seed<=10)macro="/remoll/evgen/set elastic\n/remoll/beamcurr 65 uA\n"+std::string(seed==9?"/remoll/rasx 2 mm\n":"")+"/run/beamOn 3\n";
   macro.insert(macro.find("/run/beamOn"),std::string("/remoll/SD/enable_all\n")+(seed==10?"/remoll/SD/detect all 150252\n/remoll/SD/detect all 73001\n":"/remoll/SD/detect_range boundaryhits 110000 152000\n/remoll/SD/detect_range surfacehits 73001 73028\n"));
+  if(seed==11)macro="/remoll/interval 999\n/remoll/bias/beamp/mode mixture\n/remoll/bias/beamp/physicalFraction 0.2\n"+macro;
+  if(seed==12)macro="/control/execute macros/sieve/sieve_out.mac\n"+macro;
+  if(seed==13){d.fNthrown=100;macro="/remoll/evgen/transportNeymanEnable true\n"+macro;}
   d.fMacro.fBufferSize=macro.size()+1;d.fMacro.fBuffer=new char[d.fMacro.fBufferSize];std::strcpy(d.fMacro.fBuffer,macro.c_str());
   if(seed==3)d.fGitInfo="";
   if(seed!=4){
@@ -76,7 +79,17 @@ void Make(){
   run.load_hit_file([base/'1.root',base/'9.root'],'1',response=selected)
   assert run.state['hits']['result'] is None
   assert 'Incompatible transport' in run.state['hits']['message'],run.state['hits']['message']
+  assert '/remoll/rasx 2 mm' in run.state['hits']['message'],run.state['hits']['message']
   print('PASS different interactions sum; mismatched transport rejected across interactions')
+  run.load_hit_file([base/'1.root',base/'11.root'],'1',response=selected)
+  assert math.isclose(run.state['hits']['result']['signal_total'],156,rel_tol=1e-12),run.state['hits']['message']
+  run.load_hit_file([base/'1.root',base/'12.root'],'1',response=selected)
+  assert run.state['hits']['result'] is None
+  assert '/control/execute macros/sieve/sieve_out.mac' in run.state['hits']['message'],run.state['hits']['message']
+  run.load_hit_file([base/'13.root'],'1',response=selected)
+  assert run.state['hits']['result'] is None
+  assert 'stratified MC' in run.state['hits']['message'],run.state['hits']['message']
+  print('PASS proposal/reporting pooling, nested macro rejection and early Neyman diagnosis')
   run.load_hit_file([base/'10.root'],'1',response=selected)
   assert run.state['hits']['result'] is None
   assert 'entry recording' in run.state['hits']['message'],run.state['hits']['message']
@@ -84,7 +97,7 @@ void Make(){
   assert run.state['hits']['result']['hits']==4
   print('PASS all-step PE weighting rejected; raw hit counts remain available')
   (base/'6.neyman.tsv').write_text('independent malicious fixture: sampled history normalization')
-  for seed,message in [(3,'source identity'),(4,'Saved geometry'),(5,'does not match'),(6,'stratified normalization')]:
+  for seed,message in [(3,'source identity'),(4,'Saved geometry'),(5,'does not match'),(6,'stratified MC')]:
    run.load_hit_file([base/f'{seed}.root'],'1',response=selected)
    assert run.state['hits']['result'] is None, seed
    assert message in run.state['hits']['message'],run.state['hits']['message']

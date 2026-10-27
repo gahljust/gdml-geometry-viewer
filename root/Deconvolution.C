@@ -31,10 +31,14 @@ inline std::string digest(const fs::path& p){std::unique_ptr<TMD5> h(TMD5::FileC
 inline std::string digest_text(const std::string& s){TMD5 h;h.Update(reinterpret_cast<const UChar_t*>(s.data()),s.size());h.Final();return h.AsString();}
 // Shared provenance checks for both PE maps and the deconvolution.
 inline void check_sampling(TFile& file,TTree* tree,const fs::path& path,std::string macro){
+    // Comments are not sampling instructions. Conservatively reject recorded quota plans.
+    std::istringstream lines(macro);std::string line,commands;
+    while(std::getline(lines,line))commands+=line.substr(0,line.find('#'))+"\n";
+    macro=commands;
     std::transform(macro.begin(),macro.end(),macro.begin(),[](unsigned char c){return std::tolower(c);});
     if(macro.find("neyman")!=std::string::npos||macro.find("fixed_quota")!=std::string::npos||file.Get("sampling_plan")||
        tree->GetBranch("hit_weight")||tree->GetBranch("sampling_weight")||fs::exists(path.parent_path()/(path.stem().string()+".neyman.tsv")))
-        throw std::runtime_error("Sampled input needs its stratified normalization adapter. Hit counts remain available.");
+        throw std::runtime_error("Neyman/fixed-quota or externally weighted input requires stratified MC uncertainty support, which is not implemented. Corrected event rates alone do not establish that uncertainty. Hit counts remain available.");
 }
 inline std::map<std::string,std::string> saved_geometry(const remollRunData& data){
     if(data.fGitInfo.empty())throw std::runtime_error("Simulation source identity is missing. Hit counts remain available.");
@@ -60,11 +64,16 @@ inline void check_main_geometry(const std::map<std::string,std::string>& gdml,co
     }
     if(!thin)throw std::runtime_error("Main PE needs saved thin-quartz geometry. Hit counts remain available.");
 }
+// Known rate-corrected proposal controls; other bias commands remain significant.
+inline bool proposal_setting(const std::string& command){
+    return command=="/remoll/bias/beamp/mode"||command=="/remoll/bias/beamp/min"||
+           command=="/remoll/bias/beamp/max"||command=="/remoll/bias/beamp/physicalFraction";
+}
 // Compare transport across interactions, not only generator settings within one.
 // Preserve ordered commands: multiple field scale/current commands are meaningful.
-inline std::string transport_identity(const remollRunData& data,const std::string& macro){
-    std::string identity=data.fGitInfo+"\n";
-    for(const auto& g:saved_geometry(data))identity+=g.first+"="+g.second+"\n";
+inline std::vector<std::string> transport_details(const remollRunData& data,const std::string& macro){
+    std::vector<std::string> identity={"source="+digest_text(data.fGitInfo)};
+    for(const auto& g:saved_geometry(data))identity.push_back("geometry "+g.first+"="+g.second);
     std::vector<std::string> fields;
     for(const auto& field:data.fMagData){
         auto bounded=[](const char* value,size_t size){const auto* end=static_cast<const char*>(std::memchr(value,0,size));
@@ -73,7 +82,7 @@ inline std::string transport_identity(const remollRunData& data,const std::strin
         std::replace(name.begin(),name.end(),'\\','/');name=name.substr(name.find_last_of('/')+1);
         fields.push_back(name+"="+bounded(field.hashsum,sizeof(field.hashsum)));
     }
-    std::sort(fields.begin(),fields.end());for(const auto& f:fields)identity+="field "+f+"\n";
+    std::sort(fields.begin(),fields.end());for(const auto& f:fields)identity.push_back("field "+f);
     std::istringstream lines(macro);std::string line;
     while(std::getline(lines,line)){
         line=line.substr(0,line.find('#'));std::istringstream words(line);std::string command,word,value;words>>command;
@@ -83,22 +92,37 @@ inline std::string transport_identity(const remollRunData& data,const std::strin
         }
         if(command.rfind("/remoll/evgen/",0)==0||command.rfind("/remoll/SD/",0)==0||
            command=="/remoll/seed"||command=="/remoll/beamcurr"||command=="/remoll/filename"||
+           command=="/remoll/interval"||
+           // These proposal settings change sampling, with correction already in rate.
+           proposal_setting(command)||
            command=="/remoll/setgeofile"||command=="/remoll/setgeofileParallel"||
            command=="/run/initialize"||command=="/run/numberOfThreads"||command=="/run/verbose"||command=="/run/printProgress")continue;
-        if(command.rfind("/remoll/",0)!=0&&command.rfind("/process/",0)!=0&&command.rfind("/physics/",0)!=0&&command.rfind("/run/",0)!=0)continue;
+        // Includes may move geometry after GDML loading. Compare their ordered calls;
+        // never read today's local macro as evidence of what a past run executed.
+        if(command.rfind("/remoll/",0)!=0&&command.rfind("/process/",0)!=0&&command.rfind("/physics/",0)!=0&&command.rfind("/run/",0)!=0&&command.rfind("/control/",0)!=0)continue;
         if(command.find("verbose")!=std::string::npos||command=="/remoll/print"||command=="/remoll/target/print")continue;
         while(words>>word)value+=(value.empty()?"":" ")+word;
-        identity+=command+" "+value+"\n";
+        identity.push_back(command+" "+value);
     }
-    return digest_text(identity);
+    return identity;
+}
+inline std::string transport_identity(const remollRunData& data,const std::string& macro){
+    std::string text;for(const auto& item:transport_details(data,macro))text+=item+"\n";
+    return digest_text(text);
 }
 struct Input {
     fs::path path;long long events=0,seed=0;int process=-1;double current=0;
     std::string commit,geometry,macro,transport;
+    std::vector<std::string> transportDetails;
     std::map<std::string,std::string> settings;
 };
 inline void check_transport(const Input& a,const Input& b){
-    if(a.transport!=b.transport)throw std::runtime_error("Incompatible transport: source, geometry, magnetic fields or beam/physics settings differ");
+    if(a.transport==b.transport)return;
+    size_t i=0;while(i<a.transportDetails.size()&&i<b.transportDetails.size()&&a.transportDetails[i]==b.transportDetails[i])++i;
+    auto item=[&](const Input& r){return i<r.transportDetails.size()?r.transportDetails[i]:"<no corresponding record>";};
+    const bool control=item(a).rfind("/control/",0)==0||item(b).rfind("/control/",0)==0;
+    throw std::runtime_error("Incompatible transport: first differing record in "+a.path.filename().string()+" ["+item(a)+"] versus "+b.path.filename().string()+" ["+item(b)+"]."+
+        (control?" Included macro contents are not stored; differing calls cannot be assumed equivalent.":" Analyze separately."));
 }
 inline void check_generation_settings(const Input& a,const Input& b){
     if(a.process!=b.process)return;
@@ -152,9 +176,9 @@ inline Input inspect(const fs::path& path,const std::vector<int>& ids,bool mainP
     TFile file(path.string().c_str(),"READ");auto* tree=file.Get<TTree>("T");auto* data=file.Get<remollRunData>("run_data");
     if(!tree||!data)throw std::runtime_error("Missing T or run_data in "+path.string());
     Input r;r.path=path;r.events=data->fNthrown;r.seed=data->fSeed;r.commit=data->fGitInfo;r.macro=data->fMacro.fBuffer?data->fMacro.fBuffer:"";
-    if(r.events<2||r.events!=tree->GetEntries())throw std::runtime_error("Generated/stored event count mismatch in "+path.string());
-    if(r.commit.empty())throw std::runtime_error("Simulation source identity is missing");
     check_sampling(file,tree,path,r.macro);
+    if(r.events<2||r.events!=tree->GetEntries())throw std::runtime_error("Generated/stored event count mismatch: run_data="+std::to_string(r.events)+", T="+std::to_string(tree->GetEntries())+" in "+path.filename().string()+". Filtered, incomplete or multi-run files need verified normalization; no event count is substituted.");
+    if(r.commit.empty())throw std::runtime_error("Simulation source identity is missing");
     std::set<int> enabled,entries;int runs=0;std::istringstream lines(r.macro);std::string line;
     while(std::getline(lines,line)){
         line=line.substr(0,line.find('#'));std::istringstream words(line);std::string command,value;words>>command;
@@ -177,6 +201,7 @@ inline Input inspect(const fs::path& path,const std::vector<int>& ids,bool mainP
     if(mainPE)check_main_geometry(gdml,thin_md5);
     for(const auto& g:gdml)r.geometry+=g.first+" "+g.second+"\n";
     r.transport=transport_identity(*data,r.macro);
+    r.transportDetails=transport_details(*data,r.macro);
     return r;
 }
 inline portable_deconv::Moments scan(const Input& input,const std::vector<int>& ids,const portable_deconv::Fits& sm,
