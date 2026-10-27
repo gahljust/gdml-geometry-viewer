@@ -13,11 +13,25 @@ Detector selections use recorded IDs. ShowerMax signals use virtual planes
 73001–73028, not internal quartz layers. Presets expose their ROOT cuts in the UI.
 PE model support restrictions still apply. Cathode current is PE/s × elementary charge.
 
-For each event, sum selected signals per detector, then accumulate
-`R = Σ w q` and `B = Σ w q qᵀ` (one rate weight, not its square).
-`Crs = Brs / (P² T Rr Rs)`, `M = Hᵀ C⁻¹ H`; statistical covariance is `M⁻¹`.
-Finite simulation uncertainty propagates through H separately. Fit metadata checks
-are stricter than hit viewing; missing information must not become zero.
+For one event, add the selected expected PE in each detector. Call the totals
+in two detectors `a` and `b`, and the normalized event rate `w`. Accumulate:
+
+- Detector rates: `R₁ = Σ w a`, `R₂ = Σ w b`.
+- Second moments: `B₁₁ = Σ w a²`, `B₁₂ = B₂₁ = Σ w a b`, `B₂₂ = Σ w b²`.
+
+Each sum runs over events, using that event’s `a`, `b` and `w`. The rate appears
+once in each product. Repeat for all detector pairs to fill B.
+
+Convert each entry to projected asymmetry covariance:
+`Cᵣₛ = Bᵣₛ / (P² T Rᵣ Rₛ)`; multiply by `10¹⁸` for ppb².
+Here r and s identify detectors, P is polarization and T is beam time in seconds.
+Use the asymmetry-adjusted dilution matrix H to calculate `M = Hᵀ C⁻¹ H`.
+The projected statistical uncertainty of each extracted asymmetry is the square
+root of its diagonal entry in `M⁻¹`. Finite simulation uncertainty propagates
+through H separately.
+
+Deconvolution requires compatible run metadata and detector coverage.
+Missing information is reported, not treated as zero.
 
 The same steps can run separately, without the browser:
 
