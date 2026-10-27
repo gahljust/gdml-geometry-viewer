@@ -1,4 +1,4 @@
-# MOLLER Geometry Viewer
+# Remoll Geometry Viewer
 
 Load remoll geometry and ROOT files; inspect hits, PE signals and deconvolution.
 Files stay on your computer.
