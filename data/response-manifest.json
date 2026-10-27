@@ -6,8 +6,9 @@
     "archive_sha256": "d464b5c4a30429051544be0f38d1aa6a981af0ac5cd6bcc9fc191954bcf9d55e",
     "folder": "docdb_july14_2026",
     "document_url": null,
-    "document_reference_status": "Exact document number not yet recovered; download metadata records https://moller-docdb.physics.sunysb.edu/",
-    "note": "Original CSV bytes; PositionDepTable filenames aliased to NewLookupTable. Identity with October tables not established."
+    "document_reference_status": "Document reference supplied by project owner.",
+    "note": "Original CSV bytes; PositionDepTable filenames aliased to NewLookupTable. Identity with October tables not established.",
+    "document_reference": "Moller-doc-1662-v1"
   },
   "showermax_source": "remoll analysis/showermax/response_lookup/data",
   "sha256": {
