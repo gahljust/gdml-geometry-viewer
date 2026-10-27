@@ -1,0 +1,45 @@
+{
+  "version": "2026-10-25",
+  "main_source": {
+    "origin": "MOLLER DocDB",
+    "archive": "MainDet_ResponseFunction.zip",
+    "archive_sha256": "d464b5c4a30429051544be0f38d1aa6a981af0ac5cd6bcc9fc191954bcf9d55e",
+    "folder": "docdb_july14_2026",
+    "document_url": null,
+    "document_reference_status": "Exact document number not yet recovered; download metadata records https://moller-docdb.physics.sunysb.edu/",
+    "note": "Original CSV bytes; PositionDepTable filenames aliased to NewLookupTable. Identity with October tables not established."
+  },
+  "showermax_source": "remoll analysis/showermax/response_lookup/data",
+  "sha256": {
+    "main_pe/r3_NewLookupTable.csv": "a0bafaa1a07038457dbbbf85db6b6b34419010a163a7e13263b2ab950a741add",
+    "main_pe/r2_EnergyDepTable.csv": "4f60f6a0c0346d7f960dad7c4bce93938110a60599ecb94568e64f0829969676",
+    "main_pe/r1_EnergyDepTable.csv": "94457089da01040ec679c9000058a7d579e140b6267abf92c6b0150c0eac8e90",
+    "main_pe/r6_NewLookupTable.csv": "8bfb2a5b42f53bcaafe540fbc016400c5eecfa1c4f085f50df0c39fd9c7de932",
+    "main_pe/r4_EnergyDepTable.csv": "710fc3c46bfa96b215abb7cb80fbf71123fde713589abbc44cae4d87781fc451",
+    "main_pe/r5_NewLookupTable.csv": "8de90a8827f9de92e3345548748aa274e167ac185451247138571d236585ec22",
+    "main_pe/r5_EnergyDepTable.csv": "06efbb3836c19c4f6fdfa82fe9e8bb614a014093b560c734ab2b4df7db4fd0af",
+    "main_pe/r4_NewLookupTable.csv": "c16eb87ce814c6faaf6e08be950fb02d2701fa516fdc1d8db12213b5d4b33f16",
+    "main_pe/r6_EnergyDepTable.csv": "0e6436790d041b780fd91c74b94fa2c385fc6fd9b5ba18dc39c6f8dec87ba5dc",
+    "main_pe/r1_NewLookupTable.csv": "caec93a6f027f5e38382b16466313a64f766637505e59462b6e7d802325fa1d2",
+    "main_pe/r2_NewLookupTable.csv": "d8ce3c9d5b3c06f06a4fc3dd1b6c19ef301af193e35c5018133944573d43d961",
+    "main_pe/r3_EnergyDepTable.csv": "440647d0f79925ae3099e07f1b25e4a5fdc839ef48d704aaf7bee43ef0e606d8",
+    "response/fit_param_xy_mu+_ifarm.csv": "378528d35534a4f5fc265da4d2988edd2cb56d494309fd47aba788b3a2740d8e",
+    "response/fit_param_xy_mu-_ifarm.csv": "378528d35534a4f5fc265da4d2988edd2cb56d494309fd47aba788b3a2740d8e",
+    "response/fit_param_xy_gamma_ifarm.csv": "328190dc3ee20db31ee27120cf56b1e15c7e7738a4c9f5e6f525b85d43399b26",
+    "response/fit_param_xy_e+_ifarm.csv": "1e26f7ecefb2e1e04025dea5897e2e4d2a129889cd31c75dfe79ea41a8aac6c2",
+    "response/fit_param_xy_e-_ifarm.csv": "1e26f7ecefb2e1e04025dea5897e2e4d2a129889cd31c75dfe79ea41a8aac6c2",
+    "response/fit_param_xy_pi+_ifarm.csv": "f0c17b23cfd642ad2af68e2850e8be1fdeccb5b5912d4ee4b3b1249bb33ecadd",
+    "response/fit_param_xy_neutron_ifarm.csv": "83f479ef4bdda9f9ede1c2c29395e174d0c081218d978cde35dfcd3623f9ffbe",
+    "response/fit_param_xy_pi-_ifarm.csv": "f0c17b23cfd642ad2af68e2850e8be1fdeccb5b5912d4ee4b3b1249bb33ecadd"
+  },
+  "code_source": {
+    "main": "JeffersonLab/remoll develop 15eb235236b998ccb64927ac0f1df485a5f2142c; PR 649 and PR 647",
+    "showermax": "Portable adapter; module coordinates selected by recorded detector ID. Tables from remoll analysis/showermax/response_lookup/data."
+  },
+  "code_sha256": {
+    "vendor/main_response/lookuptable.C": "66ff13be9912a7e092a1a6cb33851cda13b492ec3e00a154f889bda446c8b0b0",
+    "vendor/main_response/convert_labframe_to_local_thinquartz.C": "20853195e7d9e27aa3e757d8b69b750a4e0e3a4e4eb7f742592f4528b80b6814",
+    "vendor/portable/detector_selection.hh": "114608d91c9ca3ff8316476ce86abf2ef407c1d55316b41513623acf05d186ed",
+    "vendor/portable/scan.C": "99e49d7a03474ee3ad27a9df60a6f3dcf4ff0af10ade71a926b991a1eb1aa837"
+  }
+}

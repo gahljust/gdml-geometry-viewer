@@ -1,73 +1,55 @@
-# GDML Geometry Viewer
+# MOLLER detector workspace
 
-A small, local viewer for remoll’s six main detector rings and ShowerMax.
-Watch Geant4 placements become meshes, inspect the executing code, and unwrap
-all detector rings. Optionally color them by ROOT hit counts or stored rates.
+Load remoll geometry and ROOT files; inspect hits, PE signals and deconvolution.
+Files stay on your computer.
 
-## Run
+In the terminal where ROOT and Geant4 are configured:
 
-Requires Python 3.10+, CMake 3.20+, a C++17 compiler, and Geant4 with GDML support.
-ROOT is required for ROOT-file analysis. Use an environment where these tools
-are available; no Docker or Python/JavaScript packages are needed.
-Linux’s file picker needs Zenity or Python Tk.
-
-```bash
-git clone https://github.com/gahljust/gdml-geometry-viewer.git
-cd gdml-geometry-viewer
-python3 run.py
+```sh
+python3 launch.py --remoll "/path/to/remoll"
 ```
 
-Select your **remoll checkout**, then **Load**. The first load builds a small
-helper in `build/`. If Geant4 is not found, set `Geant4_DIR` to the directory
-containing `Geant4Config.cmake`. On Windows, use `python` instead of `python3`.
+On Windows, use `py -3` instead of `python3`, from your configured compiler/ROOT
+[terminal](https://root.cern/install/). Open http://127.0.0.1:8784/; **Quit** or Ctrl+C stops it.
+No Python packages, Node, Docker, remoll rebuild or internet connection needed.
+Requires **Python 3.9+, ROOT with ACLiC/C++17, Geant4 with GDML, CMake 3.20+ and a compatible C++17 compiler**.
+Use the compiler/runtime environment matching your existing ROOT and Geant4 builds.
 
-**Pause / Step** follows the code; **Finish loading** skips the waits.
-**Stop** cancels the current operation; **Reload** starts again.
-**Quit** or **Ctrl+C** closes the app. Default address: <http://127.0.0.1:8785/>.
-Use `--port 8786` for another port, or `--no-open` to skip opening the browser.
+- `--check`: check installed tools; installs nothing.
+- `--geometry-only`: build the helper, write geometry JSON, then exit.
+- `--output /path/to/build`: choose a build/result directory without spaces (ROOT/ACLiC limitation; input filenames may contain spaces).
+- `--geant4-dir /path/to/Geant4`: folder containing `Geant4Config.cmake`, if not found.
+- `--no-open`: serve without opening a browser.
 
-## ROOT values
+Geant4 discovery uses `Geant4_DIR`, remoll's `build*/CMakeCache.txt`, or CMake's
+[normal CMake search](https://geant4.web.cern.ch/documentation/dev/ig_html/InstallationGuide/buildtools.html) (`CMAKE_PREFIX_PATH`). The first geometry load compiles one small
+helper; subsequent loads reuse it. Native file dialogs are optional: paths can be
+pasted directly. Linux dialogs use Zenity or Tk if already installed.
 
-Choose a file, then click **Analyze**. Files remain local.
+| Step | Code |
+|---|---|
+| Launch, build and serve | `launch.py` → `geometry/run.py` (Python standard library) |
+| GDML → placed detector meshes | `geometry/export_geometry.cc` (Geant4, built by CMake) |
+| ROOT files → cuts, histograms, PE | `geometry/load_hits.C` (ROOT/ACLiC) |
+| ROOT files → deconvolution | `Deconvolution.C` → `root/Deconvolution.C` |
+| Results → browser | `geometry/deconvolution_bridge.C`, JSON, `geometry/*.js` |
+| Response models | `app/responses.py`, `data/`, `vendor/` |
+| [Visual guides](docs/GUIDES.txt) (PDF) | [Loading](docs/run-flow.pdf) · [Analysis](docs/analysis-flow.pdf) · [Using the app](docs/workspace-guide.pdf) · [ROOT fields](docs/root-output-atlas.pdf) |
 
-- **Hits:** every stored `hit.det` record; no particle, energy or direction cuts.
-- **Rate [Hz]:** sum the stored scalar `rate` once per hit, without renormalizing.
-- Main detector IDs match GDML `DetNo`. ShowerMax uses **virtual planes only**;
-  its physical quartz layers are display geometry, never a substitute for plane hits.
-- Missing plane hits make ShowerMax unavailable. Missing/invalid rates disable Rate.
-  Zero hits cannot distinguish a disabled detector from one that received no hits.
+See [ROOT-only commands](docs/ANALYSIS.md) and
+[response origins](THIRD_PARTY.md). Bundled or local PE models are selectable.
+PE/current requires recorded detector entries; all-step files remain usable in Hits.
 
-Uses tree `T`, split `hit.det` (or `vector<int>`), and optionally scalar double
-`rate`. This is a hit/rate viewer, not PE response or deconvolution analysis.
-Geometry comes from the chosen checkout, before macro-driven moves; the app
-cannot verify that a ROOT file used that same geometry.
+**Visual guides:** see [docs/](docs/GUIDES.txt) for diagrams of the code, analysis and app, with example cuts.
 
-## Code
+**Tests:** see [tests/README.md](tests/README.md) for what each test checks and how to run it.
+Run all: `python3 tests/run.py --remoll "/path/to/remoll"`.
 
-| File | Purpose |
-| --- | --- |
-| `run.py` | Local server, embedded Geant4 exporter and ROOT counting macro |
-| `index.html` | Canvas viewer, placement trace, unwrapping and hit display |
-| `test_*.py`, `test_display.js` | Lifecycle, synthetic ROOT inputs and display checks |
+Standalone builds/results stay in `build/`; this research checkout uses
+`rootfiles/local_work/experiments/detector_launcher/geometry-build`.
+`MOLLER_OUTPUT` also overrides the location. **Save view** downloads one JSON;
+recent selections use bounded memory, with no automatic saved-analysis archive.
+ROOT/GDML and local response code run natively; use trusted files and code.
 
-Geant4 reads `geometry/mollerMother.gdml` and its references. The exporter walks
-the loaded detector hierarchy, combines parent transforms and checks vertices
-against Geant4 navigation. The native reader waits at each displayed step;
-this shows the loaded placements, not the parser’s internal operations.
-Generated C++ and its displayed line numbers can be inspected in `build/`.
-ShowerMax plane IDs come from `geometry/mollerParallel.gdml`.
-
-## Checks
-
-With the app running, set `REMOLL_DIR` to your remoll checkout, then run:
-
-```bash
-python3 test_lifecycle.py
-python3 test_root.py
-node test_display.js
-```
-
-Tests replace the current load; ROOT fixtures are small and removed afterward.
-The ROOT test uses the checkout’s `develop` header. Node is needed only for the
-display test. Tested on macOS and [Linux](https://github.com/gahljust/remoll/actions/runs/39910911862);
-Windows has not been verified.
+Uses standard CMake and ROOT build paths for macOS, Linux and Windows; the latest
+end-to-end source-package check was on macOS, not a three-platform certification.

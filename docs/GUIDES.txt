@@ -1,0 +1,6 @@
+Visual guides
+
+workspace-guide.pdf - Using the app, selecting views and writing cuts.
+run-flow.pdf - Loading GDML geometry and drawing the detectors.
+analysis-flow.pdf - ROOT hits, PE weighting and deconvolution.
+root-output-atlas.pdf - remoll ROOT fields, meanings and units.

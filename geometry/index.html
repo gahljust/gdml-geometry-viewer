@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOLLER · Detector workspace</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f5f7;color:#193044;font:14px system-ui,sans-serif}main{padding:20px 24px;max-width:2100px;margin:auto}
+button,input,select,textarea{font:inherit;color:inherit;border:1px solid #cbd5dd;background:white;border-radius:6px;padding:7px 10px;min-width:0}button{cursor:pointer}button:hover{border-color:#07809d}button:disabled{opacity:.45;cursor:default}button[aria-pressed=true],.primary{background:#087e99;color:white;border-color:#087e99}button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #087e99;outline-offset:2px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}h1{font-size:18px;margin:0;font-weight:600}h1 span{color:#748594;font-weight:400;margin-left:10px}h2{font-size:14px;font-weight:650;margin:0}p{margin:0}.row{display:flex;gap:8px;align-items:center}.grow{flex:1}label,.caption{font-size:11px;color:#64798a}.filebar{display:flex;gap:10px;align-items:center;margin-bottom:10px}.filebar input{flex:1}.geometry-config{margin-left:8px;position:relative}.geometry-config summary{cursor:pointer;white-space:nowrap;font-size:12px}.geometry-config .popover{position:absolute;right:0;top:30px;width:min(620px,90vw);background:white;padding:15px;z-index:10;border:1px solid #cbd5dd;box-shadow:0 8px 25px #18354920;border-radius:8px}.popover input{min-width:0;flex:1}.statusline{min-height:22px;font-size:12px;color:#627888;overflow-wrap:anywhere}#status{font-size:11px;margin-top:8px}
+.workspace{display:grid;grid-template-columns:minmax(390px,1.5fr) minmax(310px,1.05fr) minmax(245px,.8fr);gap:16px;height:calc(100dvh - 158px);min-height:560px}.panel{background:white;border:1px solid #dbe2e8;border-radius:10px;min-width:0;overflow:hidden}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;border-bottom:1px solid #e4e9ed}.scene{display:flex;flex-direction:column}.scene .surfaceMap{border:0;border-radius:0;display:flex;flex-direction:column;flex:1;min-height:0}.scene .surfaceStage{height:auto!important;flex:1;min-height:300px}.scene footer{padding:10px 14px;min-height:46px;font-size:11px;color:#627888;line-height:1.5}#tile-clear{font-size:11px;padding:5px 8px}#selection-label{font-size:11px;color:#627888}
+.analysis{display:flex;flex-direction:column;gap:12px;min-height:0}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.modes button{font-size:12px;padding:10px 5px}.modes button:disabled{background:#edf1f4;border-color:transparent}.subcuts{padding:14px;display:grid;gap:11px}.subcuts .line{display:grid;grid-template-columns:68px 1fr;align-items:center;gap:8px}.subcuts select{width:100%;font-size:12px}.segments{display:flex;gap:4px;flex-wrap:wrap}.segments button{font-size:11px;padding:6px 8px;flex:1}.subcuts h2{margin-bottom:2px}.plotpanel{flex:1;display:flex;flex-direction:column;min-height:260px}.plotpanel .panelhead{padding:12px 14px}.plotpanel select{font-size:12px;max-width:190px}.plotstage{flex:1;min-height:180px;display:grid;place-items:center;padding:5px 8px}#plot{width:100%;height:100%;max-height:440px}#plot-empty{color:#7b8b98;font-size:13px;padding:24px;text-align:center}#plot-note{padding:8px 14px 12px;color:#728391;font-size:10px;line-height:1.5}
+.cuts{display:flex;flex-direction:column}.cutbody{padding:14px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}#hit-cut{width:100%;flex:1;min-height:210px;resize:none;background:#f7f9fb;font:11px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2;border-color:#dbe3e9}#applied-cut{font-size:11px;color:#64798a;overflow-wrap:anywhere;max-height:100px;overflow:auto}#cut-state{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#64798a}#apply-cut{flex:1}#hit-details{font-size:11px;border-top:1px solid #e4e9ed;padding-top:10px}summary{cursor:pointer}#hit-fields,#hit-counts{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;max-height:110px;overflow:auto}#hit-fields button,#hit-counts button{font-size:10px;padding:4px 6px}details p{font-size:10px;line-height:1.5;color:#768694;margin-top:8px}[hidden]{display:none!important}
+.surfaceMap{width:100%;min-width:0;border:1px solid #d9dee6;border-radius:8px;overflow:hidden;background:#0c1420}
+.surfaceToolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;background:#101c2b;border-bottom:1px solid #2a3b4d;color:#c5d5e5}
+.surfaceToolbar>div{display:flex;gap:5px}.surfaceToolbar button{padding:5px 8px;font-size:12px;border:1px solid #34495f;background:#142335;color:#c5d5e5;border-radius:5px;min-height:0}
+.surfaceToolbar button[aria-pressed=true]{background:#254959;border-color:#7de1dc;color:#acffec}.surfaceToolbar label{display:flex;align-items:center;gap:4px;font-size:12px;margin:0}.surfaceToolbar input{accent-color:#66dcca}
+.surfaceStage{position:relative;height:clamp(390px,53vh,640px)}.surfaceStage canvas{display:block;width:100%!important;height:100%!important;aspect-ratio:auto!important;touch-action:none;cursor:grab}
+.surfaceMessage{position:absolute;top:44%;left:8%;right:8%;text-align:center;color:#b8cddd;font-size:14px;pointer-events:none}
+.surfaceLegend{position:absolute;bottom:16px;left:16px;width:220px;pointer-events:none;color:#b8cddd;font-size:11px}.surfaceRamp{height:9px;border-radius:2px}.surfaceEnds{display:flex;justify-content:space-between;margin:4px 0 2px}.surfaceHelp{position:absolute;right:12px;bottom:16px;color:#8fa6bc;font-size:10px;pointer-events:none}
+@media(max-width:700px){.surfaceStage{height:390px}.surfaceHelp{display:none}.surfaceToolbar button{font-size:11px;padding:5px}.surfaceLegend{width:180px}.placementValues{min-width:95px}}
+.surfaceMap .surfaceToolbar label{flex-direction:row;color:#c5d5e5;white-space:nowrap}.surfaceMap .surfaceToolbar input{margin:0;width:13px;height:13px}
+.surfaceNavigation{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:#101c2b;color:#8fa6bc;border-bottom:1px solid #2a3b4d;font-size:11px}
+.surfaceNavigation>div{display:flex;gap:4px}.surfaceNavigation button{padding:3px 9px;font-size:12px;background:#142335;border:1px solid #34495f;color:#c5d5e5}
+.surfaceNavigation button[aria-pressed=true]{background:#254959;border-color:#7de1dc;color:#acffec}.surfaceStage canvas.dragging{cursor:grabbing}
+@media(max-width:480px){.surfaceNavigation>span{display:none}}
+.surfaceStage canvas.surfaceAngleOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.surfaceLayoutNote{position:absolute;right:10px;top:8px;font:10px system-ui;color:#9ab4ca;pointer-events:none}
+.surfaceToolbar{flex-wrap:wrap}
+
+/* Fixed workspace: give the map priority; keep every working panel visible. */
+html,body{height:100%;overflow:hidden}
+main{height:100dvh;max-width:none;padding:8px 12px;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:6px}
+.launchbar{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1.3fr) auto;align-items:center;gap:12px}
+h1{font-size:14px}.sourcebar{display:flex;align-items:center;gap:5px;min-width:0}.sourcebar label{white-space:nowrap;font-size:10px}
+.sourcebar input,.sourcebar textarea{flex:1;width:0;font:11px/18px system-ui;padding:3px 6px;height:26px;min-height:26px;resize:none;white-space:pre;overflow:auto}
+.launchbar button{font-size:11px;padding:4px 7px;white-space:nowrap}.statusrow{display:flex;gap:16px;align-items:center;min-width:0}
+.statusline,#status{min-height:14px;margin:0;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#status{max-width:28%;flex-shrink:0}
+.workspace{height:auto;min-height:0;grid-template-columns:minmax(0,2.65fr) minmax(0,1fr) minmax(0,.9fr);gap:8px}
+.panelhead{padding:8px 10px}.panelhead h2{font-size:12px}.scene,.analysis,.cuts{min-height:0}
+.scene .surfaceStage{min-height:0}.scene footer{min-height:0;padding:5px 9px;font-size:10px}
+.analysis{gap:7px}.modes{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}.modes button{font-size:11px;padding:6px 3px;overflow-wrap:anywhere}
+.subcuts{padding:9px;gap:6px}.subcuts .line{grid-template-columns:minmax(0,1fr);gap:2px}.subcuts h2{font-size:12px}
+.subcuts select{padding:4px 6px;font-size:12px;min-width:0;width:100%}.subcuts label{font-size:10px}
+.segments{flex-wrap:nowrap}.segments button{padding:4px 3px;font-size:11px;min-width:0}
+.plotpanel{min-height:0}.plotpanel .panelhead{padding:7px 9px;flex-wrap:wrap}.plotpanel select{max-width:100%;padding:4px;font-size:11px}
+.plotstage{min-height:0;overflow:hidden;position:relative}#plot{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);max-height:none}
+#plot-note{padding:4px 8px;font-size:9px}
+.cutbody{padding:8px;gap:7px;overflow:hidden}#hit-cut{min-height:0;font-size:9px;line-height:1.5;padding:7px}
+.cutbody>label{font-size:10px}.cutbody .row{gap:4px;flex-wrap:wrap}.cutbody button{font-size:11px;padding:6px}
+#applied-cut{max-height:35px;flex-shrink:0;font-size:9px}#charge-help{font-size:10px;line-height:1.4;color:#617586;flex-shrink:0}
+#hit-details{flex-shrink:0;max-height:25%;overflow:auto;padding-top:5px;font-size:10px}
+.surfaceToolbar{padding:5px 7px;gap:8px;justify-content:flex-start;flex-wrap:wrap;flex-shrink:0}.surfaceToolbar>div{gap:3px}
+.surfaceToolbar button{font-size:10px;padding:4px 6px;white-space:nowrap}.surfaceToolbar label{font-size:10px}
+.surfaceHelp{display:none}.surfaceLegend{position:static;width:auto;display:flex;align-items:center;gap:10px;padding:6px 10px;background:#101c2b;font-size:10px;flex-shrink:0;pointer-events:auto}
+.surfaceRamp{width:100px;height:7px;flex-shrink:0}.surfaceEnds{width:90px;margin:0;gap:10px}.surfaceUnit{margin-left:auto}
+@media(min-width:851px) and (max-height:720px){
+ .subcuts{gap:4px;padding:7px}.subcuts .line{grid-template-columns:53px minmax(0,1fr);align-items:center;gap:3px}
+ .subcuts select{font-size:10px;padding:4px 2px}.segments button{font-size:9px;padding:4px 1px}.subcuts h2{display:none}
+ .modes button{padding:5px 2px;font-size:10px}
+}
+@media(max-width:1100px){.launchbar{gap:7px;grid-template-columns:auto minmax(0,1fr) minmax(0,1.2fr) auto}.sourcebar label{display:none}.workspace{grid-template-columns:minmax(0,2.2fr) minmax(0,1fr) minmax(0,.9fr)}}
+@media(max-width:850px){
+ main{padding:6px;gap:5px}.launchbar{grid-template-columns:minmax(0,1fr) auto;gap:5px}.launchbar h1{display:none}.sourcebar{grid-column:1}.launchbar>#quit{grid-column:2;grid-row:1/3}
+ .workspace{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1.1fr) minmax(0,1fr);gap:6px}
+ .analysis{display:contents}.modes{grid-column:1/-1;grid-row:1;grid-template-columns:repeat(5,minmax(0,1fr))}
+ .scene{grid-column:1;grid-row:2}.subcuts{grid-column:2;grid-row:2;align-content:start;overflow:auto}
+ .plotpanel{grid-column:1;grid-row:3}.cuts{grid-column:2;grid-row:3}.cutbody>label{display:none}
+ .surfaceLegend{gap:4px;font-size:8px;padding:4px}.surfaceRamp{width:40px}.surfaceEnds{width:45px}.scene footer{display:none}
+ #charge-help{font-size:9px}#status{display:none}.subcuts h2{display:none}.subcuts select{font-size:10px}.subcuts{gap:3px;padding:5px}
+ .subcuts .line{grid-template-columns:1fr;gap:1px}.subcuts label{font-size:9px}.segments button{font-size:9px}
+ .surfaceToolbar{gap:4px;padding:4px}.surfaceToolbar button,.surfaceToolbar label{font-size:9px;padding:3px}.surfaceToolbar>div{flex-wrap:wrap}
+ .modes button{font-size:9px}.panelhead{padding:5px}.panelhead h2{font-size:11px}#selection-label{font-size:9px}.panelhead .row{gap:2px}
+}
+/* One workspace; trade space between views without changing the selection. */
+#view-divider{display:none}#toggle-cuts{font-size:11px;padding:5px 7px;white-space:nowrap}
+@media(min-width:851px){
+ .workspace{--scene-share:58fr;--plot-share:42fr;--cuts-width:44px;grid-template-columns:minmax(290px,var(--scene-share)) 12px minmax(280px,var(--plot-share)) var(--cuts-width);gap:6px}
+ .workspace.cuts-open{--cuts-width:clamp(210px,19vw,290px)}
+ #view-divider{display:flex;align-items:center;justify-content:center;cursor:col-resize;touch-action:none;border-radius:6px;outline-offset:-1px}
+ #view-divider::after{content:"";height:44px;width:3px;border-radius:3px;background:#bac9d2;transition:background .15s}
+ #view-divider:hover,#view-divider:focus-visible{background:#dceaf0;outline:1px solid #82b8c7}
+ #view-divider:hover::after,#view-divider:focus-visible::after{background:#087e99}
+ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none!important}
+ .analysis{min-width:0}.modes{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .subcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 12px}
+ .subcuts h2{grid-column:1/-1}.subcuts .line{grid-template-columns:minmax(0,1fr)}
+ .cuts .panelhead{gap:5px;flex-wrap:wrap}.cuts .panelhead #toggle-cuts{margin-left:auto}
+ .cuts.is-collapsed .cutbody,.cuts.is-collapsed h2{display:none}
+ .cuts.is-collapsed .panelhead{height:100%;padding:8px 4px;justify-content:flex-start;flex-direction:column;border:0;gap:16px}
+ .cuts.is-collapsed #toggle-cuts{margin:0;writing-mode:vertical-rl;display:flex;align-items:center;gap:9px;padding:9px 6px;border-color:transparent;background:#e8f2f5;color:#086c83}
+ .cuts.is-collapsed #cut-state{writing-mode:vertical-rl;order:2;font-size:9px}
+}
+@media(max-width:850px){
+ .workspace{--scene-share:50fr;--plot-share:50fr;grid-template-rows:auto minmax(0,var(--scene-share)) 10px minmax(0,var(--plot-share));gap:4px}
+ .subcuts{min-height:0}.plotpanel{grid-column:1/-1;grid-row:4;width:calc(100% - 36px)}
+ #view-divider{display:flex;grid-column:1/-1;grid-row:3;align-items:center;justify-content:center;cursor:row-resize;touch-action:none;border-radius:4px}
+ #view-divider::after{content:"";width:44px;height:3px;background:#9db4c1;border-radius:3px}
+ #view-divider:focus-visible,#view-divider:hover{background:#dceaf0;outline:1px solid #82b8c7}
+ .cuts{grid-column:2;grid-row:4;justify-self:end;width:32px}.cuts .panelhead{padding:4px;gap:5px}
+ #toggle-cuts{display:block;font-size:10px;padding:4px;margin-left:auto}
+ .cuts.is-collapsed .cutbody,.cuts.is-collapsed h2{display:none}
+ .cuts.is-collapsed .panelhead{height:100%;display:flex;flex-direction:column;justify-content:flex-start;border:0;gap:10px}
+ .cuts.is-collapsed #toggle-cuts{margin:0;writing-mode:vertical-rl;border:0;background:#e8f2f5;color:#086c83;padding:7px 4px}
+ .cuts.is-collapsed #cut-state{writing-mode:vertical-rl;order:2;font-size:8px}
+ .workspace.cuts-open .plotpanel{grid-column:1;width:100%}.workspace.cuts-open .cuts{width:100%}
+ .cuts:not(.is-collapsed) .panelhead h2{font-size:10px}.cuts:not(.is-collapsed) #cut-state{display:none}
+ .plotpanel .panelhead{padding:4px 6px}.plotpanel select{font-size:10px}.plotstage{padding:2px}
+ #plot-note{font-size:8px;padding:2px 5px}.cutbody{padding:4px;gap:3px}.cutbody .row{flex-wrap:nowrap}.cutbody button{font-size:9px;padding:4px}
+ body.resizing,body.resizing *{cursor:row-resize!important;user-select:none!important}
+}
+
+.plotpanel{position:relative}.plot-tools{display:flex;gap:3px}.plot-tools button{font-size:10px;padding:4px 7px}.plot-tools button[aria-pressed="true"]{background:#087e99;color:white;border-color:#087e99}
+.plot-choice{padding:4px 8px;display:flex;min-width:0}.plot-choice select{width:100%;max-width:none;min-width:0}
+#plot-settings{position:absolute;z-index:10;top:34px;right:6px;left:6px;background:#fff;border:1px solid #bdcdd7;border-radius:7px;box-shadow:0 6px 22px #162c3530;padding:9px;font-size:11px;max-height:calc(100% - 40px);overflow:auto}
+#plot-settings[hidden]{display:none}.plot-checks{display:flex;gap:12px;flex-wrap:wrap}.plot-checks label{display:flex;gap:4px;align-items:center;font-size:11px}.plot-checks input{width:auto;margin:0}.plot-ranges{display:grid;grid-template-columns:14px 1fr 1fr;gap:5px;margin:9px 0}.plot-ranges input{min-width:0;width:100%;font-size:11px;padding:4px}#plot-settings small{font-size:9px;flex:1;color:#617786}#plot-settings button{font-size:10px;padding:4px 7px}
+
+/* Independent vertical split inside the analysis column. */
+#plot-height-divider{display:none}
+@media(min-width:851px){
+ .analysis{overflow:hidden;gap:4px}
+ .analysis>.modes{flex-shrink:0}
+ .analysis>.subcuts{flex:0 0 var(--selection-height,180px);min-height:0;overflow:auto;align-content:start}
+ #plot-height-divider{display:flex;flex:0 0 12px;align-items:center;justify-content:center;cursor:row-resize;touch-action:none;border-radius:5px}
+ #plot-height-divider::after{content:"";width:52px;height:3px;border-radius:3px;background:#9db4c1}
+ #plot-height-divider:hover,#plot-height-divider:focus-visible{background:#dceaf0;outline:1px solid #82b8c7}
+ #plot-height-divider:hover::after,#plot-height-divider:focus-visible::after{background:#087e99}
+}
+body.resizing-height,body.resizing-height *{cursor:row-resize!important;user-select:none!important}
+
+.panel-switches{display:flex;gap:3px;margin-left:auto;flex-shrink:0}.panel-switches button{padding:3px 6px;font-size:10px}.statusrow{flex-wrap:wrap;gap:5px}
+[data-minimize],[data-panel-focus]{font-size:12px;padding:2px 6px;line-height:1.2}.selection-heading{display:flex;grid-column:1/-1;align-items:center;justify-content:space-between}.selection-heading h2{display:block}
+.plot-labels{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}.plot-labels input{width:100%;font-size:11px;padding:5px}.plot-labels #plot-title{grid-column:1/-1}
+#bin-settings{margin-top:9px;border-top:1px solid #dbe3e9;padding-top:7px}#bin-settings summary{font-size:11px}.bin-axis{border:0;border-top:1px solid #edf1f3;padding:6px 0;margin:6px 0;min-width:0}.bin-axis legend{font-size:10px;font-weight:600}.bin-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.bin-fields label{display:flex;flex-direction:column;gap:2px;font-size:10px}.bin-fields input,.bin-fields select{width:100%;min-width:0;font-size:11px;padding:4px}#bin-status{font-size:10px;color:#8a3c21;margin-top:5px}
+.workspace.hide-scene>.scene,.workspace.hide-scene>#view-divider{display:none}
+.workspace.hide-selection .modes,.workspace.hide-selection .subcuts,.workspace.hide-selection #plot-height-divider{display:none}
+.workspace.hide-distribution .plotpanel,.workspace.hide-distribution #plot-height-divider{display:none}
+.workspace.hide-distribution.hide-selection>.analysis,.workspace.hide-distribution.hide-selection>#view-divider{display:none}
+.workspace.hide-distribution .subcuts{flex:1}
+@media(min-width:851px){
+ .workspace.hide-scene{grid-template-columns:minmax(0,1fr) var(--cuts-width)}
+ .workspace.hide-distribution.hide-selection{grid-template-columns:minmax(0,1fr) var(--cuts-width)}
+ .workspace.hide-scene.hide-distribution.hide-selection{grid-template-columns:1fr}
+}
+@media(max-width:850px){
+ .selection-heading h2{display:none}.selection-heading{position:absolute;right:4px;top:3px}.subcuts{position:relative}.subcuts>.line:first-of-type{padding-right:16px}
+ .panel-switches{gap:2px}.panel-switches button{font-size:9px;padding:2px 4px}
+ .workspace.hide-selection{grid-template-rows:minmax(0,var(--scene-share)) 10px minmax(0,var(--plot-share))}
+ .workspace.hide-selection>.scene{grid-column:1/-1;grid-row:1}.workspace.hide-selection>#view-divider{grid-row:2}.workspace.hide-selection .plotpanel,.workspace.hide-selection>.cuts{grid-row:3}
+ .workspace.hide-scene{grid-template-rows:auto auto minmax(0,1fr)}.workspace.hide-scene .subcuts{grid-column:1/-1;grid-row:2;grid-template-columns:repeat(2,minmax(0,1fr))}.workspace.hide-scene .plotpanel,.workspace.hide-scene>.cuts{grid-row:3}
+ .workspace.hide-distribution{grid-template-rows:auto minmax(0,1fr)}.workspace.hide-distribution>#view-divider{display:none}.workspace.hide-distribution>.scene{grid-column:1;grid-row:2}.workspace.hide-distribution>.cuts{grid-row:2}
+ .workspace.hide-scene.hide-selection,.workspace.hide-distribution.hide-selection{grid-template-columns:minmax(0,1fr) 32px;grid-template-rows:minmax(0,1fr)}
+ .workspace.hide-scene.hide-selection .plotpanel,.workspace.hide-distribution.hide-selection>.scene{grid-column:1;grid-row:1;width:100%}
+ .workspace.hide-scene.hide-selection>.cuts,.workspace.hide-distribution.hide-selection>.cuts{grid-column:2;grid-row:1}
+ .workspace.hide-scene.hide-distribution{grid-template-columns:minmax(0,1fr) 32px;grid-template-rows:auto minmax(0,1fr)}.workspace.hide-scene.hide-distribution .subcuts{grid-column:1;grid-row:2}.workspace.hide-scene.hide-distribution>.cuts{grid-column:2;grid-row:2}
+ .workspace.hide-selection.hide-distribution>#view-divider{display:none}
+}
+
+.workspace.focus-scene,.workspace.focus-distribution{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important}
+.workspace.focus-scene>.cuts,.workspace.focus-distribution>.cuts{display:none}
+.workspace.focus-distribution>.analysis{display:contents}
+.workspace.focus-scene>.scene,.workspace.focus-distribution .plotpanel{grid-column:1!important;grid-row:1!important;width:100%!important}
+@media(max-width:850px){.workspace.hide-distribution:not(.hide-selection) .subcuts{width:calc(100% - 36px)}}
+
+/* Settings occupy their own dock; the graph is never covered. */
+.plotpanel{container-type:inline-size}
+.plotbody{display:grid;grid-template-columns:minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
+.plotbody>.plotstage{grid-column:1;grid-row:1;min-width:0}
+#plot-settings{position:static;inset:auto;grid-column:2;grid-row:1;z-index:auto;max-height:none;min-height:0;min-width:0;border:0;border-left:1px solid #dbe3e9;border-radius:0;box-shadow:none;padding:10px;background:#f7f9fb;overflow:auto}
+.plotpanel.settings-open .plotbody{grid-template-columns:minmax(0,1fr) 270px}
+.range-heading{display:flex;justify-content:space-between;gap:6px;margin-top:10px;font-size:10px;color:#607584}.range-heading strong{font-weight:600;color:#243e51}.range-heading span{font-size:9px}
+.plot-ranges>span{font-size:10px;color:#607584}
+#axis-status{font-size:10px;color:#943e25;line-height:1.4;margin:4px 0}
+@container(max-width:620px){
+ .plotpanel.settings-open .plotbody{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,.85fr)}
+ #plot-settings{grid-column:1;grid-row:2;border-left:0;border-top:1px solid #dbe3e9;padding:7px}
+}
+/* The same selection remains reachable when either view is expanded. */
+#shared-cuts{font-size:10px;padding:3px 7px;background:#e8f2f5;color:#086c83;white-space:nowrap}
+#shared-cut-state{font-size:10px;color:#84601e}
+.workspace.focus-scene.cuts-open,.workspace.focus-distribution.cuts-open{grid-template-columns:minmax(0,1fr) 280px!important}
+.workspace.focus-scene.cuts-open>.cuts,.workspace.focus-distribution.cuts-open>.cuts{display:flex;grid-column:2!important;grid-row:1!important;width:100%}
+@media(max-width:850px){
+ .workspace.focus-scene.cuts-open,.workspace.focus-distribution.cuts-open{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) minmax(0,.8fr)!important}
+ .workspace.focus-scene.cuts-open>.cuts,.workspace.focus-distribution.cuts-open>.cuts{grid-column:1!important;grid-row:2!important}
+ .workspace.focus-scene.cuts-open .cutbody,.workspace.focus-distribution.cuts-open .cutbody{overflow:auto}
+}
+
+.response-options{position:relative;font-size:11px}.response-options summary{cursor:pointer;border:1px solid #cbd5dd;border-radius:6px;padding:3px 7px;background:white;white-space:nowrap}
+.response-options .response-body{position:absolute;z-index:30;left:0;top:28px;width:min(390px,85vw);padding:12px;background:white;border:1px solid #bdcdd7;border-radius:8px;box-shadow:0 8px 24px #19304425;display:grid;gap:9px}
+.response-body label{display:grid;gap:3px}.response-body input,.response-body select{width:100%;font-size:11px;padding:6px}.response-body fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}.response-body fieldset[hidden]{display:none}#response-status{font-size:11px;line-height:1.45;overflow-wrap:anywhere}.response-body small{font-size:10px;color:#64798a}
+@media(max-width:850px){.response-options .response-body{position:fixed;left:8px;right:8px;top:110px;width:auto;max-height:calc(100vh - 120px);overflow:auto}}
+
+main{display:flex;flex-direction:column}.launchbar,.statusrow{flex-shrink:0}.workspace{flex:1}
+.page-tabs{display:flex;gap:18px;flex-shrink:0;border-bottom:1px solid #d4dfe7;padding:0 2px}.page-tabs button{min-height:0;line-height:16px;border:0;border-radius:0;padding:2px 2px;background:transparent;color:#617586;font-size:13px;border-bottom:2px solid transparent}.page-tabs button[aria-pressed=true]{color:#087e99;border-bottom-color:#087e99;font-weight:650;background:transparent}
+.distribution-scope{display:flex;align-items:center;padding:2px 8px;gap:8px;font-size:10px;flex-shrink:0}#shared-cuts{background:transparent;border:0;color:#617586;padding:0;font-size:10px;font-weight:400;text-decoration:underline;text-underline-offset:2px}#shared-cut-state{font-size:10px}.signal-controls{display:flex;gap:2px;align-items:center;margin-left:auto}.signal-controls button{font-size:10px;padding:3px 6px}.scene>.panelhead{flex-wrap:wrap;gap:5px}.scene>.panelhead>.row{margin-left:auto}
+#response-options{border:1px solid #cedae2;border-radius:12px;width:min(440px,92vw);padding:0;color:#193044;box-shadow:0 16px 60px #142d3c33}#response-options::backdrop{background:#132b3c38}#response-options .response-body{display:grid;gap:14px;padding:20px;position:static;width:auto;max-height:85vh;overflow:auto;background:#fff;box-shadow:none;border:0}.response-heading{display:flex;align-items:center;justify-content:space-between}.response-heading h2{font-size:17px}.response-heading button{border:0;font-size:20px;padding:0 5px}.response-choice{display:flex;padding:3px;background:#edf3f6;border-radius:8px;gap:4px}.response-choice button{flex:1;padding:8px;border:0;background:transparent}.response-choice button[aria-pressed=true]{background:white;color:#087e99;box-shadow:0 1px 4px #152e4020}.response-body label{gap:5px;font-size:11px}.response-body input{padding:8px}.response-body #response-status{font-size:11px;color:#617586}.response-body small{font-size:10px}
+/* One frame: controls stay compact; only result contents scroll. */
+.workspace[hidden],.fit-page[hidden],.statusrow[hidden],#fit-results[hidden]{display:none!important}
+.fit-page{flex:1;min-height:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;padding:0}
+.fit-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-shrink:0}
+.fit-toolbar>div:first-child{display:flex;align-items:baseline;gap:10px;min-width:0}
+.fit-toolbar h2{font-size:13px;white-space:nowrap}.fit-toolbar p{font-size:10px;color:#617586;margin:0;max-height:34px;overflow:auto}
+.fit-toolbar .row{gap:4px;flex-shrink:0}.fit-toolbar button{font-size:11px;line-height:16px;padding:3px 8px}
+.fit-settings{display:flex;gap:12px;align-items:center;flex-shrink:0;background:white;border:1px solid #d4dfe7;border-radius:6px;padding:4px 8px}
+.fit-settings label{display:flex;align-items:center;gap:5px;font-size:10px;white-space:nowrap;min-width:0}
+.fit-settings input{width:65px;font-size:11px;line-height:16px;padding:2px 5px;border-radius:4px}
+.fit-settings .extra-backgrounds{flex:1}.fit-settings .extra-backgrounds input{flex:1;width:0;min-width:60px}
+#fit-readiness{min-height:0;max-height:35%;overflow:auto;flex-shrink:1}#fit-readiness:empty{display:none}
+.fit-readiness-row{display:grid;grid-template-columns:minmax(120px,1fr) 90px minmax(160px,2fr);gap:8px;border-bottom:1px solid #e1e8ed;padding:4px 6px;font-size:11px;overflow-wrap:anywhere}
+.fit-missing{padding:4px;color:#914b2a;font-size:11px}
+#fit-results{display:flex;flex-direction:column;flex:1;min-height:0;gap:4px}
+.fit-summary{display:flex;gap:10px;justify-content:space-between;flex-shrink:0;font-size:10px;line-height:14px;color:#617586;padding:0 2px}
+.fit-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:8px;flex:1;min-height:0;overflow:hidden}
+.fit-correlations{display:flex;flex-direction:column;min-height:0}.fit-correlations .panelhead{padding:5px 8px;flex-shrink:0}
+.fit-correlations .surfaceMap{flex:1;min-height:0;display:flex;flex-direction:column;border:0;border-radius:0}
+.fit-correlations .surfaceStage{flex:1;min-height:0;height:auto!important}
+.fit-correlations .surfaceToolbar,.fit-correlations .surfaceNavigation{padding:3px 6px;gap:5px;flex-shrink:0}
+.fit-correlations .surfaceToolbar button,.fit-correlations .surfaceNavigation button{font-size:10px;padding:2px 5px}
+.fit-correlations .surfaceNavigation>span{display:none}
+.fit-matrices{display:flex;flex-direction:column;min-height:0}
+.matrix-tabs{display:flex;flex-wrap:wrap;gap:3px;padding:4px;border-bottom:1px solid #e0e7ed;flex-shrink:0}
+.matrix-tabs button{font-size:10px;line-height:15px;padding:3px 6px}
+#fit-matrix{padding:6px 8px;overflow:auto;font-size:11px;flex:1;min-height:0}
+#fit-matrix table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+#fit-matrix th,#fit-matrix td{padding:5px 6px;text-align:right;border-bottom:1px solid #e0e7ed;white-space:nowrap}
+#fit-matrix th:first-child,#fit-matrix td:first-child{text-align:left}
+#fit-matrix th{font-size:10px;font-weight:600;color:#64798a;white-space:normal}
+#fit-matrix caption{text-align:left;padding-bottom:5px;color:#64798a;font-size:10px}
+#fit-matrix canvas{display:block;width:min(100%,540px);aspect-ratio:1;image-rendering:pixelated}
+.fit-method{font-size:10px;color:#617586;flex-shrink:0;max-height:25%;overflow:auto}
+.fit-method summary{cursor:pointer}.fit-method p{max-width:1000px;line-height:1.5;margin-top:5px}
+#fit-tile{font-size:10px;color:#617586}
+@media(max-width:1100px){.fit-settings{gap:7px}.fit-settings input{width:57px}.fit-settings .extra-backgrounds{min-width:0}}
+@media(max-width:850px){
+ .fit-toolbar{gap:4px;flex-wrap:wrap}.fit-toolbar>div:first-child{gap:6px}.fit-toolbar .row{margin-left:auto}.fit-toolbar h2{font-size:12px}.fit-toolbar button{font-size:10px;padding:2px 5px}
+ .fit-settings{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}.fit-settings label{justify-content:space-between}.fit-settings .extra-backgrounds input{min-width:0;width:60px}
+ .fit-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:5px}
+ .fit-correlations,.fit-matrices{height:auto;min-height:0}
+ .fit-summary{flex-wrap:wrap;gap:0 8px;font-size:9px;line-height:12px}
+ .fit-readiness-row{grid-template-columns:1fr}.page-tabs{gap:16px}.page-tabs button{font-size:11px}.scene>.panelhead>.row{display:none}.signal-controls{flex-wrap:wrap;margin:0}.signal-controls button{font-size:9px;padding:3px}
+}
+
+
+/* Online correlation explorer, fitted inside the existing single-frame panel. */
+.correlation-viewer{display:flex;flex-direction:column;flex:1;min-height:0;background:#0c1420;color:#e6edf5;font:11px/1.3 system-ui,sans-serif}
+.correlation-viewer header{display:block;flex:none;margin:0;padding:4px 6px;border-bottom:1px solid #283648}
+.correlation-viewer button,.correlation-viewer summary{color:#c5d5e5;background:#142335;border:1px solid #34495f;border-radius:4px;font-size:9px;padding:3px 5px;cursor:pointer;white-space:nowrap}
+.correlation-viewer button:hover,.correlation-viewer button:focus-visible{border-color:#7de1dc;color:white}
+.correlation-viewer button[aria-pressed=true]{background:#254959;border-color:#7de1dc;color:#acffec}
+.correlation-viewer .controlGrid{display:grid;gap:3px}.correlation-viewer .toolbar{display:flex;gap:4px;align-items:center}
+.correlation-viewer .viewToggle{display:flex;align-items:center;gap:3px;font-size:9px;color:#b4c6d7;white-space:nowrap}
+.correlation-viewer input{margin:0;accent-color:#66dcca}
+.correlation-viewer .ringFocus{display:grid;grid-template-columns:.7fr repeat(6,minmax(0,1fr)) 1.65fr;gap:3px}
+.correlation-viewer .ringFocus button{padding:2px 1px;font-size:9px;overflow:hidden;text-overflow:ellipsis}
+.correlation-main{display:flex;flex-direction:column;flex:1;min-height:0}
+.correlation-viewer .stage{position:relative;flex:1;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#17273a,#0b131f 75%)}
+.correlation-viewer canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab;outline-offset:-3px}
+.correlation-viewer .hint{display:none;position:absolute;right:5px;bottom:3px;color:#92a7bc;font-size:8px;text-align:right;pointer-events:none}
+.correlation-viewer .layoutNote{position:absolute;top:3px;right:5px;color:#95a8bb;font-size:8px;pointer-events:none}
+.correlation-viewer .tip{position:absolute;pointer-events:none;display:none;background:#101b2bf2;border:1px solid #6387a0;border-radius:4px;padding:5px;font-size:10px;max-width:260px;z-index:2}
+.correlation-viewer .legend{flex:none;display:flex;align-items:center;gap:6px;padding:3px 6px;background:#101c2b;font-size:8px;pointer-events:none}
+.correlation-viewer .legend b{font-weight:400}.correlation-viewer .ramp{height:6px;flex:1;border-radius:2px}.correlation-viewer .ends{display:flex;gap:10px;color:#b4c6d7}
+.correlation-viewer aside{display:grid;grid-template-columns:minmax(100px,1fr) minmax(0,2fr);gap:6px;flex:none;padding:4px 6px;background:#101c2b;border-top:1px solid #283648}
+.correlation-viewer .selectionBlock{min-width:0}.correlation-viewer aside label{display:block;font-size:8px;color:#a9bacb;margin-bottom:2px}
+.correlation-viewer #detectorMenu{position:relative}.correlation-viewer #detector{font-size:9px;padding:3px 4px;overflow:hidden;text-overflow:ellipsis}
+.correlation-viewer #selectedName,.correlation-viewer .key{display:none!important}.correlation-viewer #selectedRegion{font-size:8px;color:#99efff;margin-top:2px}
+.correlation-viewer #detectorOptions{position:absolute;bottom:calc(100% + 4px);left:0;width:260px;max-height:min(250px,40vh);overflow:auto;z-index:20;padding:7px;background:#142335;border:1px solid #57718b;border-radius:6px;box-shadow:0 6px 20px #0009}
+.correlation-viewer #detectorOptions h2{font-size:12px;color:#e6edf5;border-bottom:1px solid #34495f;margin:8px 0 4px;padding-bottom:3px}
+.correlation-viewer #detectorOptions h3{font-size:10px;color:#a9c8dd;margin:5px 0 3px}
+.correlation-viewer .detectorChoices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+.correlation-viewer #partnersTitle{font-size:8px;color:#b4c6d7;margin:0 0 2px;font-weight:500}
+.correlation-viewer #partners{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+.correlation-viewer .partner{display:flex;flex-direction:column;align-items:flex-start;min-width:0;font-size:8px;padding:2px 3px;overflow:hidden}
+.correlation-details{flex:none;min-height:0}.correlation-details:empty{display:none}.fit-matrices #fit-matrix th,.fit-matrices #fit-matrix td{padding:3px 6px}
+.correlation-viewer .partner>div{max-width:100%;overflow:hidden;text-overflow:ellipsis}.correlation-viewer .partner span{display:none}.correlation-viewer .partner strong{color:#7ee9d5;font-size:9px;font-weight:500}
+@media(max-width:850px){.correlation-viewer aside{max-height:70px;overflow:auto}.correlation-viewer .hint{display:none}}
+
+
+/* Compact run controls in the lower corner; reserve the frame for results. */
+main:has(.fit-page:not([hidden])){padding-top:5px;padding-bottom:5px;gap:3px}
+.fit-page{gap:3px}.fit-toolbar button{padding:2px 6px;font-size:10px;line-height:14px}
+.fit-summary{display:none}.fit-toolbar p{font-size:9px}.fit-correlations .panelhead{padding:3px 7px}
+.fit-footer{display:flex;gap:8px;align-items:end;flex:none;justify-content:space-between}
+.fit-footer-left{min-width:0;display:flex;align-items:center;gap:12px;flex:1}
+.fit-footer .fit-settings{width:390px;max-width:55%;display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:3px 7px;padding:4px 6px;margin:0}
+.fit-footer .fit-settings label{font-size:9px;gap:4px;justify-content:space-between}
+.fit-footer .fit-settings input{width:46px;font-size:10px;line-height:13px;padding:1px 3px}
+.fit-footer .fit-settings .extra-backgrounds{grid-column:1/-1}.fit-footer .fit-settings .extra-backgrounds input{width:0;flex:1}
+.fit-footer .fit-method{max-height:80px;font-size:9px}
+.fit-footer .correlation-details{flex:none;background:transparent;color:#193044;max-width:200px}
+.fit-footer .correlation-viewer aside{display:block;border:0;padding:0;background:transparent;overflow:visible;max-height:none}
+.fit-footer .correlation-viewer .partnerBlock{display:none}
+.fit-footer .correlation-viewer #selectedRegion,.fit-footer .correlation-viewer #detectorLabel{display:none}
+.fit-footer .correlation-viewer #detector{background:white;color:#193044;border-color:#cbd5dd;padding:3px 6px}
+
+
+.page-tabs #save-view{margin-left:auto;font-size:11px;padding:3px 8px;border:1px solid #b6cbd5;border-radius:5px;align-self:center}
+</style>
+<main>
+<div class="launchbar">
+<h1>MOLLER</h1>
+<div class="sourcebar"><label for="root">remoll</label><input id="root" placeholder="remoll directory" spellcheck="false"><button id="choose" title="Choose remoll directory">Browse</button><button id="load">Geometry</button></div>
+<div class="sourcebar"><label for="hit-file">ROOT files</label><textarea id="hit-file" rows="1" placeholder="One file path per line" aria-label="ROOT files" spellcheck="false"></textarea><button id="choose-hits" title="Select one or more files; adds to the list">Add files</button><button id="load-hits">Load</button></div>
+<button id="quit">Quit</button></div>
+<nav class="page-tabs" aria-label="Workspace page"><button data-page="detector" aria-pressed="true">Detector view</button><button data-page="deconvolution" aria-pressed="false">Deconvolution</button><button id="save-view" title="Download this view as a JSON file">Save view</button></nav>
+<div class="statusrow"><span id="status" role="status">Choose remoll.</span><span id="hit-status" class="statusline" role="status">Choose ROOT files.</span><nav class="panel-switches" aria-label="Visible panels"><button data-panel="scene" aria-pressed="true">3D</button><button data-panel="selection" aria-pressed="true">Selection</button><button data-panel="distribution" aria-pressed="true">Distribution</button><button id="restore-panels" title="Restore all panels">All</button></nav></div>
+<div class="workspace">
+<section class="scene panel"><div class="panelhead"><h2>Detector view</h2><div class="signal-controls" role="group" aria-label="Signal weighting"><button data-signal="hits" aria-pressed="true">Hits</button><button data-signal="pe" aria-pressed="false">PE</button><button data-signal="current" aria-pressed="false">Current</button><button data-response-settings title="Response files and fit code">Response</button></div><div class="row"><button data-panel-focus="scene" aria-label="Expand 3D viewer" title="Expand 3D viewer">⛶</button><button data-minimize="scene" aria-label="Minimize 3D viewer" title="Minimize 3D viewer">−</button><span id="selection-label">All tiles</span><button id="tile-clear" hidden>Clear tile</button></div></div><div id="surface-map" class="surfaceMap" aria-label="3D detector hit map"></div><footer id="hit-legend">Click a tile to select it.</footer></section>
+<div id="view-divider" role="separator" tabindex="0" aria-label="Resize detector and plot views" aria-orientation="vertical" aria-valuemin="30" aria-valuemax="72" aria-valuenow="58" title="Drag to resize · double click to reset"></div>
+<section class="analysis" aria-label="Analysis views">
+<nav class="modes" aria-label="Main view"><button data-mode="hits" aria-pressed="true">Hit maps</button><button data-mode="secondary">Secondaries</button><button data-mode="raw">Raw hits</button></nav>
+<div class="subcuts panel"><div class="selection-heading"><h2>Selection</h2><button data-minimize="selection" aria-label="Minimize Selection" title="Minimize Selection">−</button></div>
+<div class="line"><label for="system">Detector</label><select id="system"><option value="main">Main detector</option><option value="ring1">Ring 1</option><option value="ring2">Ring 2</option><option value="ring3">Ring 3</option><option value="ring4">Ring 4</option><option value="ring5">Ring 5</option><option value="ring6">Ring 6</option><option value="showermax">ShowerMax</option><option value="all">All recorded</option></select></div>
+<div class="line"><label for="region">Region</label><select id="region"><option value="all">All regions</option><option value="open">Open</option><option value="closed">Closed</option><option value="transition">Transition</option></select></div>
+<div class="line" id="ancestry-row"><label for="ancestry">Particles</label><select id="ancestry"><option value="all">All particles</option><option value="primary">Primaries</option><option value="secondary">Secondaries</option></select></div>
+<div class="line"><label>Momentum</label><div class="segments" aria-label="Momentum"><button data-direction="all" aria-pressed="true">All</button><button data-direction="forward">Forward</button><button data-direction="backward">Backward</button></div></div>
+<div class="line"><label for="particle">Type</label><select id="particle"><option value="all">All types</option><option value="11">Electrons</option><option value="-11">Positrons</option><option value="22">Gammas</option><option value="2212">Protons</option><option value="2112">Neutrons</option></select></div>
+</div>
+<div id="plot-height-divider" role="separator" tabindex="0" aria-label="Resize distribution height" aria-orientation="horizontal" aria-valuemin="15" aria-valuemax="70" aria-valuenow="35" title="Drag up for a taller plot · double click to reset"></div>
+<section class="plotpanel panel">
+<div class="panelhead"><h2>Distribution</h2><div class="plot-tools"><button data-panel-focus="distribution" aria-label="Expand Distribution" title="Expand Distribution">⛶</button><button data-minimize="distribution" aria-label="Minimize Distribution" title="Minimize Distribution">−</button><button data-dimension="1" aria-pressed="true">1D</button><button data-dimension="2" aria-pressed="false">2D</button><button id="plot-settings-toggle" aria-expanded="false" aria-controls="plot-settings">Settings</button></div></div>
+<div class="plot-choice"><select id="plot-kind" aria-label="Distribution quantity"></select><select id="plot-pair" aria-label="2D distribution" hidden></select></div>
+<div class="plotbody">
+<div id="plot-settings" hidden>
+<div class="plot-checks"><label><input id="plot-log-x" type="checkbox">Log X</label><label><input id="plot-log-y" type="checkbox">Log Y</label><label><input id="plot-grid-x" type="checkbox" checked>X grid</label><label><input id="plot-grid-y" type="checkbox" checked>Y grid</label><label id="plot-color-option" hidden><input id="plot-log-color" type="checkbox" checked>Log color</label></div>
+<div class="plot-labels"><input id="plot-title" placeholder="Plot title" aria-label="Plot title" maxlength="120"><input id="plot-x-label" placeholder="Default X label" aria-label="X axis label" maxlength="120"><input id="plot-y-label" placeholder="Default Y label" aria-label="Y axis label" maxlength="120"></div>
+<div class="range-heading"><strong>Axis limits</strong><span>Updates immediately</span></div><div class="plot-ranges"><span></span><span>Minimum</span><span>Maximum</span><span>X</span><input id="plot-x-min" type="number" step="any" placeholder="Auto min" aria-label="X minimum"><input id="plot-x-max" type="number" step="any" placeholder="Auto max" aria-label="X maximum"><span>Y</span><input id="plot-y-min" type="number" step="any" placeholder="Auto min" aria-label="Y minimum"><input id="plot-y-max" type="number" step="any" placeholder="Auto max" aria-label="Y maximum"></div>
+<p id="axis-status" role="status"></p><div class="row"><small>Blank = automatic</small><button id="axis-auto">Auto limits</button><button id="plot-reset">Reset</button><button id="plot-export">Save SVG</button></div>
+<details id="bin-settings"><summary>ROOT histogram bins</summary><div id="bin-axes"></div><div class="row"><small id="bin-help">Applied to selected hits in ROOT.</small><button id="apply-bins">Apply bins</button><button id="reset-bins">Default bins</button></div><p id="bin-status" role="status"></p></details>
+</div>
+<div class="plotstage"><svg id="plot" viewBox="0 0 460 310" role="img" aria-label="Selected hit distribution" hidden></svg><p id="plot-empty">Load hits to see the distribution.</p></div></div><div class="distribution-scope"><button id="shared-cuts" aria-expanded="false" aria-controls="cuts-panel">Shared cuts</button><span id="shared-cut-state" role="status"></span></div><div id="plot-note">Same selection as the 3D map · Hit counts</div></section>
+</section>
+<aside class="cuts panel is-collapsed" id="cuts-panel"><div class="panelhead"><h2>Shared ROOT cuts</h2><span id="cut-state">Preset</span><button id="toggle-cuts" aria-expanded="false" aria-controls="cuts-body" aria-label="Show ROOT cuts" title="Show ROOT cuts">Cuts <span aria-hidden="true">＋</span></button></div><div class="cutbody" id="cuts-body"><label for="hit-cut">3D map + 1D / 2D distributions</label><textarea id="hit-cut" spellcheck="false" aria-label="ROOT cut">1</textarea><div class="row"><button id="apply-cut" class="primary">Apply edits</button><button id="clear-cut">Clear cuts</button></div><div id="applied-cut"></div><p id="charge-help"><code>charged(hit.pid)</code> keeps particles with nonzero electric charge (ROOT PDG lookup). Gammas and neutrons are excluded.</p><details id="hit-details" hidden><summary>Fields &amp; detector counts</summary><p><code>charged(hit.pid)</code>: nonzero PDG charge. MeV and mm.</p><div id="hit-fields"></div><div id="hit-counts"></div></details></div></aside>
+</div>
+<section class="fit-page" id="fit-page" hidden>
+<div class="fit-toolbar"><div><p id="fit-status" role="status">Check the selected ROOT files.</p></div><div class="row"><button data-response-settings>Response</button><button id="fit-check">Check files</button><button id="fit-run" class="primary">Run deconvolution</button></div></div>
+
+<div id="fit-readiness"></div>
+<div id="fit-results" hidden><div class="fit-summary"><span id="fit-summary"></span><span>PE weighted · M = Hᵀ C⁻¹ H</span></div>
+<div class="fit-layout"><section class="panel fit-correlations"><div class="panelhead"><h2>Detector correlations</h2></div><div id="fit-map" class="correlation-viewer"></div></section>
+<section class="panel fit-matrices"><nav class="matrix-tabs" aria-label="Deconvolution result"><button data-matrix="uncertainties" aria-pressed="true">Uncertainties</button><button data-matrix="M">Deconvolution</button><button data-matrix="F">Dilutions</button><button data-matrix="H">Adjusted dilutions</button><button data-matrix="C">Covariance</button><button data-matrix="correlation">Correlation</button></nav><div id="fit-matrix"></div></section></div></div>
+<div class="fit-footer"><div class="fit-footer-left"><div id="fit-correlation-details" class="correlation-viewer correlation-details"></div><details class="fit-method"><summary>Calculation &amp; selections</summary><p>ROOT fits all 224 main tiles and 28 ShowerMax virtual planes. Main PE: forward e±, kinetic energy &gt; 1.1 MeV; angle capped at 4°. ShowerMax: forward supported particles. Reference asymmetries use the historical Ring 5 open definition. Display cuts do not change this fit.</p><p>Inputs require all three interactions, compatible run settings and geometry, independent seeds, recorded detector entries and event rate normalization. Additional generators add one fit component each. Experimental σ uses the exposure above; MC σ propagates the simulated H uncertainty.</p></details></div><div class="fit-settings"><label>Beam days<input id="fit-days" type="number" value="344" min="1"></label><label>Polarization<input id="fit-polarization" type="number" value="0.8" min="0.01" max="1" step="0.01"></label><label>Beam current [µA]<input id="fit-current" type="number" value="65" min="0.01"></label><label class="extra-backgrounds">Additional generators<input id="fit-extra" placeholder="Names, comma separated"></label></div></div>
+</section>
+
+</main>
+<dialog id="response-options"><div class="response-body"><div class="response-heading"><h2>PE response</h2><button id="response-close" aria-label="Close response settings">×</button></div>
+<div class="response-choice" role="group" aria-label="Response source"><button data-response="bundled" aria-pressed="true">Bundled</button><button data-response="local" aria-pressed="false">Local remoll</button></div><select id="response-mode" hidden><option value="bundled">Bundled</option><option value="local">Local remoll</option></select>
+<fieldset id="response-local" hidden><label>remoll directory<input id="response-remoll" spellcheck="false"></label><label>Main detector CSV folder<input id="response-main" placeholder="Defaults to analysis/table" spellcheck="false"></label><label>ShowerMax CSV folder<input id="response-sm" placeholder="Defaults to remoll’s response folder" spellcheck="false"></label></fieldset>
+<div class="row"><button id="response-save">Check &amp; use</button></div><p id="response-status" role="status">Checking resources…</p><small>Main fit + energy scaling · ShowerMax response lookup</small>
+</div></dialog>
+<template id="correlation-template"><header><div class="controlGrid"><div class="toolbar"><button id="reset">Oblique view</button><button id="front">Upstream</button><button id="side">Downstream</button><label class="viewToggle"><input type="checkbox" data-treatment="unwrapped"> Unwrapped view</label></div><div class="ringFocus" aria-label="Focus detector group"><button data-focus="all" aria-pressed="true">All</button><button data-focus="ring1" aria-pressed="false">Ring 1</button><button data-focus="ring2" aria-pressed="false">Ring 2</button><button data-focus="ring3" aria-pressed="false">Ring 3</button><button data-focus="ring4" aria-pressed="false">Ring 4</button><button data-focus="ring5" aria-pressed="false">Ring 5</button><button data-focus="ring6" aria-pressed="false">Ring 6</button><button data-focus="showermax" aria-pressed="false">ShowerMax</button></div></div></header><div class="correlation-main"><div class="stage"><small id="layoutNote" class="layoutNote" hidden>Tile spacing is illustrative only</small><canvas id="scene" tabindex="0" aria-label="Interactive 3D detector geometry. Drag to rotate; scroll to zoom. Click a tile to select it. Arrow keys rotate. Use the detector selector for keyboard selection."></canvas><div class="hint">Click a tile to select · drag to rotate<br>Shift-drag to pan · scroll to zoom</div><div class="tip" id="tip"></div></div><div class="legend"><b id="legendTitle">Correlation with selected tile</b><div class="ramp" title="ROOT Bird palette · square-root color scale"></div><div class="ends"><span>0</span><span id="legendMax">1</span></div></div><aside><div class="selectionBlock"><label id="detectorLabel">SELECTED DETECTOR</label><details id="detectorMenu"><summary id="detector" aria-labelledby="detectorLabel detector"></summary><div id="detectorOptions"></div></details><div id="selectedName"></div><div class="badge" id="selectedRegion"></div><p class="key" hidden></p></div><div class="partnerBlock"><h2 id="partnersTitle">Strongest correlations</h2><div id="partners"></div></div></aside></div></template>
+<script src="hit-map-3d.js"></script><script src="view.js"></script><script src="deconvolution.js"></script><script src="save-view.js"></script></html>

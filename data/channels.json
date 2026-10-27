@@ -1,0 +1,1486 @@
+[
+  {
+    "detector": 110110,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg1_R1-BF-Quartz"
+  },
+  {
+    "detector": 110210,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg2_R1-BF-Quartz"
+  },
+  {
+    "detector": 110310,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg3_R1-BF-Quartz"
+  },
+  {
+    "detector": 110410,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg4_R1-BF-Quartz"
+  },
+  {
+    "detector": 110510,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg5_R1-BF-Quartz"
+  },
+  {
+    "detector": 110610,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg6_R1-BF-Quartz"
+  },
+  {
+    "detector": 110710,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg7_R1-BF-Quartz"
+  },
+  {
+    "detector": 110810,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg8_R1-BF-Quartz"
+  },
+  {
+    "detector": 110910,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg9_R1-BF-Quartz"
+  },
+  {
+    "detector": 111010,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg10_R1-BF-Quartz"
+  },
+  {
+    "detector": 111110,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg11_R1-BF-Quartz"
+  },
+  {
+    "detector": 111210,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg12_R1-BF-Quartz"
+  },
+  {
+    "detector": 111310,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg13_R1-BF-Quartz"
+  },
+  {
+    "detector": 111410,
+    "system": "ring1",
+    "region": "transition",
+    "name": "BFSeg14_R1-BF-Quartz"
+  },
+  {
+    "detector": 150110,
+    "system": "ring1",
+    "region": "closed",
+    "name": "FFSeg1_R1-FF-Quartz"
+  },
+  {
+    "detector": 150210,
+    "system": "ring1",
+    "region": "open",
+    "name": "FFSeg2_R1-FF-Quartz"
+  },
+  {
+    "detector": 150310,
+    "system": "ring1",
+    "region": "closed",
+    "name": "FFSeg3_R1-FF-Quartz"
+  },
+  {
+    "detector": 150410,
+    "system": "ring1",
+    "region": "open",
+    "name": "FFSeg4_R1-FF-Quartz"
+  },
+  {
+    "detector": 150510,
+    "system": "ring1",
+    "region": "closed",
+    "name": "FFSeg5_R1-FF-Quartz"
+  },
+  {
+    "detector": 150610,
+    "system": "ring1",
+    "region": "open",
+    "name": "FFSeg6_R1-FF-Quartz"
+  },
+  {
+    "detector": 150710,
+    "system": "ring1",
+    "region": "closed",
+    "name": "FFSeg7_R1-FF-Quartz"
+  },
+  {
+    "detector": 150810,
+    "system": "ring1",
+    "region": "open",
+    "name": "FFSeg8_R1-FF-Quartz"
+  },
+  {
+    "detector": 150910,
+    "system": "ring1",
+    "region": "closed",
+    "name": "FFSeg9_R1-FF-Quartz"
+  },
+  {
+    "detector": 151010,
+    "system": "ring1",
+    "region": "open",
+    "name": "FFSeg10_R1-FF-Quartz"
+  },
+  {
+    "detector": 151110,
+    "system": "ring1",
+    "region": "closed",
+    "name": "FFSeg11_R1-FF-Quartz"
+  },
+  {
+    "detector": 151210,
+    "system": "ring1",
+    "region": "open",
+    "name": "FFSeg12_R1-FF-Quartz"
+  },
+  {
+    "detector": 151310,
+    "system": "ring1",
+    "region": "closed",
+    "name": "FFSeg13_R1-FF-Quartz"
+  },
+  {
+    "detector": 151410,
+    "system": "ring1",
+    "region": "open",
+    "name": "FFSeg14_R1-FF-Quartz"
+  },
+  {
+    "detector": 110120,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg1_R2-BF-Quartz"
+  },
+  {
+    "detector": 110220,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg2_R2-BF-Quartz"
+  },
+  {
+    "detector": 110320,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg3_R2-BF-Quartz"
+  },
+  {
+    "detector": 110420,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg4_R2-BF-Quartz"
+  },
+  {
+    "detector": 110520,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg5_R2-BF-Quartz"
+  },
+  {
+    "detector": 110620,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg6_R2-BF-Quartz"
+  },
+  {
+    "detector": 110720,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg7_R2-BF-Quartz"
+  },
+  {
+    "detector": 110820,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg8_R2-BF-Quartz"
+  },
+  {
+    "detector": 110920,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg9_R2-BF-Quartz"
+  },
+  {
+    "detector": 111020,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg10_R2-BF-Quartz"
+  },
+  {
+    "detector": 111120,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg11_R2-BF-Quartz"
+  },
+  {
+    "detector": 111220,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg12_R2-BF-Quartz"
+  },
+  {
+    "detector": 111320,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg13_R2-BF-Quartz"
+  },
+  {
+    "detector": 111420,
+    "system": "ring2",
+    "region": "transition",
+    "name": "BFSeg14_R2-BF-Quartz"
+  },
+  {
+    "detector": 150120,
+    "system": "ring2",
+    "region": "closed",
+    "name": "FFSeg1_R2-FF-Quartz"
+  },
+  {
+    "detector": 150220,
+    "system": "ring2",
+    "region": "open",
+    "name": "FFSeg2_R2-FF-Quartz"
+  },
+  {
+    "detector": 150320,
+    "system": "ring2",
+    "region": "closed",
+    "name": "FFSeg3_R2-FF-Quartz"
+  },
+  {
+    "detector": 150420,
+    "system": "ring2",
+    "region": "open",
+    "name": "FFSeg4_R2-FF-Quartz"
+  },
+  {
+    "detector": 150520,
+    "system": "ring2",
+    "region": "closed",
+    "name": "FFSeg5_R2-FF-Quartz"
+  },
+  {
+    "detector": 150620,
+    "system": "ring2",
+    "region": "open",
+    "name": "FFSeg6_R2-FF-Quartz"
+  },
+  {
+    "detector": 150720,
+    "system": "ring2",
+    "region": "closed",
+    "name": "FFSeg7_R2-FF-Quartz"
+  },
+  {
+    "detector": 150820,
+    "system": "ring2",
+    "region": "open",
+    "name": "FFSeg8_R2-FF-Quartz"
+  },
+  {
+    "detector": 150920,
+    "system": "ring2",
+    "region": "closed",
+    "name": "FFSeg9_R2-FF-Quartz"
+  },
+  {
+    "detector": 151020,
+    "system": "ring2",
+    "region": "open",
+    "name": "FFSeg10_R2-FF-Quartz"
+  },
+  {
+    "detector": 151120,
+    "system": "ring2",
+    "region": "closed",
+    "name": "FFSeg11_R2-FF-Quartz"
+  },
+  {
+    "detector": 151220,
+    "system": "ring2",
+    "region": "open",
+    "name": "FFSeg12_R2-FF-Quartz"
+  },
+  {
+    "detector": 151320,
+    "system": "ring2",
+    "region": "closed",
+    "name": "FFSeg13_R2-FF-Quartz"
+  },
+  {
+    "detector": 151420,
+    "system": "ring2",
+    "region": "open",
+    "name": "FFSeg14_R2-FF-Quartz"
+  },
+  {
+    "detector": 110130,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg1_R3-BF-Quartz"
+  },
+  {
+    "detector": 110230,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg2_R3-BF-Quartz"
+  },
+  {
+    "detector": 110330,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg3_R3-BF-Quartz"
+  },
+  {
+    "detector": 110430,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg4_R3-BF-Quartz"
+  },
+  {
+    "detector": 110530,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg5_R3-BF-Quartz"
+  },
+  {
+    "detector": 110630,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg6_R3-BF-Quartz"
+  },
+  {
+    "detector": 110730,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg7_R3-BF-Quartz"
+  },
+  {
+    "detector": 110830,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg8_R3-BF-Quartz"
+  },
+  {
+    "detector": 110930,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg9_R3-BF-Quartz"
+  },
+  {
+    "detector": 111030,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg10_R3-BF-Quartz"
+  },
+  {
+    "detector": 111130,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg11_R3-BF-Quartz"
+  },
+  {
+    "detector": 111230,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg12_R3-BF-Quartz"
+  },
+  {
+    "detector": 111330,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg13_R3-BF-Quartz"
+  },
+  {
+    "detector": 111430,
+    "system": "ring3",
+    "region": "transition",
+    "name": "BFSeg14_R3-BF-Quartz"
+  },
+  {
+    "detector": 150130,
+    "system": "ring3",
+    "region": "closed",
+    "name": "FFSeg1_R3-FF-Quartz"
+  },
+  {
+    "detector": 150230,
+    "system": "ring3",
+    "region": "open",
+    "name": "FFSeg2_R3-FF-Quartz"
+  },
+  {
+    "detector": 150330,
+    "system": "ring3",
+    "region": "closed",
+    "name": "FFSeg3_R3-FF-Quartz"
+  },
+  {
+    "detector": 150430,
+    "system": "ring3",
+    "region": "open",
+    "name": "FFSeg4_R3-FF-Quartz"
+  },
+  {
+    "detector": 150530,
+    "system": "ring3",
+    "region": "closed",
+    "name": "FFSeg5_R3-FF-Quartz"
+  },
+  {
+    "detector": 150630,
+    "system": "ring3",
+    "region": "open",
+    "name": "FFSeg6_R3-FF-Quartz"
+  },
+  {
+    "detector": 150730,
+    "system": "ring3",
+    "region": "closed",
+    "name": "FFSeg7_R3-FF-Quartz"
+  },
+  {
+    "detector": 150830,
+    "system": "ring3",
+    "region": "open",
+    "name": "FFSeg8_R3-FF-Quartz"
+  },
+  {
+    "detector": 150930,
+    "system": "ring3",
+    "region": "closed",
+    "name": "FFSeg9_R3-FF-Quartz"
+  },
+  {
+    "detector": 151030,
+    "system": "ring3",
+    "region": "open",
+    "name": "FFSeg10_R3-FF-Quartz"
+  },
+  {
+    "detector": 151130,
+    "system": "ring3",
+    "region": "closed",
+    "name": "FFSeg11_R3-FF-Quartz"
+  },
+  {
+    "detector": 151230,
+    "system": "ring3",
+    "region": "open",
+    "name": "FFSeg12_R3-FF-Quartz"
+  },
+  {
+    "detector": 151330,
+    "system": "ring3",
+    "region": "closed",
+    "name": "FFSeg13_R3-FF-Quartz"
+  },
+  {
+    "detector": 151430,
+    "system": "ring3",
+    "region": "open",
+    "name": "FFSeg14_R3-FF-Quartz"
+  },
+  {
+    "detector": 110140,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg1_R4-BF-Quartz"
+  },
+  {
+    "detector": 110240,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg2_R4-BF-Quartz"
+  },
+  {
+    "detector": 110340,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg3_R4-BF-Quartz"
+  },
+  {
+    "detector": 110440,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg4_R4-BF-Quartz"
+  },
+  {
+    "detector": 110540,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg5_R4-BF-Quartz"
+  },
+  {
+    "detector": 110640,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg6_R4-BF-Quartz"
+  },
+  {
+    "detector": 110740,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg7_R4-BF-Quartz"
+  },
+  {
+    "detector": 110840,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg8_R4-BF-Quartz"
+  },
+  {
+    "detector": 110940,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg9_R4-BF-Quartz"
+  },
+  {
+    "detector": 111040,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg10_R4-BF-Quartz"
+  },
+  {
+    "detector": 111140,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg11_R4-BF-Quartz"
+  },
+  {
+    "detector": 111240,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg12_R4-BF-Quartz"
+  },
+  {
+    "detector": 111340,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg13_R4-BF-Quartz"
+  },
+  {
+    "detector": 111440,
+    "system": "ring4",
+    "region": "transition",
+    "name": "BFSeg14_R4-BF-Quartz"
+  },
+  {
+    "detector": 150140,
+    "system": "ring4",
+    "region": "closed",
+    "name": "FFSeg1_R4-FF-Quartz"
+  },
+  {
+    "detector": 150240,
+    "system": "ring4",
+    "region": "open",
+    "name": "FFSeg2_R4-FF-Quartz"
+  },
+  {
+    "detector": 150340,
+    "system": "ring4",
+    "region": "closed",
+    "name": "FFSeg3_R4-FF-Quartz"
+  },
+  {
+    "detector": 150440,
+    "system": "ring4",
+    "region": "open",
+    "name": "FFSeg4_R4-FF-Quartz"
+  },
+  {
+    "detector": 150540,
+    "system": "ring4",
+    "region": "closed",
+    "name": "FFSeg5_R4-FF-Quartz"
+  },
+  {
+    "detector": 150640,
+    "system": "ring4",
+    "region": "open",
+    "name": "FFSeg6_R4-FF-Quartz"
+  },
+  {
+    "detector": 150740,
+    "system": "ring4",
+    "region": "closed",
+    "name": "FFSeg7_R4-FF-Quartz"
+  },
+  {
+    "detector": 150840,
+    "system": "ring4",
+    "region": "open",
+    "name": "FFSeg8_R4-FF-Quartz"
+  },
+  {
+    "detector": 150940,
+    "system": "ring4",
+    "region": "closed",
+    "name": "FFSeg9_R4-FF-Quartz"
+  },
+  {
+    "detector": 151040,
+    "system": "ring4",
+    "region": "open",
+    "name": "FFSeg10_R4-FF-Quartz"
+  },
+  {
+    "detector": 151140,
+    "system": "ring4",
+    "region": "closed",
+    "name": "FFSeg11_R4-FF-Quartz"
+  },
+  {
+    "detector": 151240,
+    "system": "ring4",
+    "region": "open",
+    "name": "FFSeg12_R4-FF-Quartz"
+  },
+  {
+    "detector": 151340,
+    "system": "ring4",
+    "region": "closed",
+    "name": "FFSeg13_R4-FF-Quartz"
+  },
+  {
+    "detector": 151440,
+    "system": "ring4",
+    "region": "open",
+    "name": "FFSeg14_R4-FF-Quartz"
+  },
+  {
+    "detector": 110151,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg1_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110152,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg1_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110153,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg1_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 110251,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg2_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110252,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg2_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110253,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg2_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 110351,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg3_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110352,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg3_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110353,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg3_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 110451,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg4_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110452,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg4_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110453,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg4_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 110551,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg5_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110552,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg5_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110553,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg5_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 110651,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg6_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110652,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg6_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110653,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg6_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 110751,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg7_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110752,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg7_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110753,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg7_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 110851,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg8_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110852,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg8_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110853,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg8_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 110951,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg9_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 110952,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg9_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 110953,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg9_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 111051,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg10_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 111052,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg10_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 111053,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg10_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 111151,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg11_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 111152,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg11_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 111153,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg11_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 111251,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg12_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 111252,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg12_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 111253,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg12_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 111351,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg13_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 111352,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg13_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 111353,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg13_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 111451,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg14_R5-BF-Quartz_L"
+  },
+  {
+    "detector": 111452,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg14_R5-FF-Quartz_C"
+  },
+  {
+    "detector": 111453,
+    "system": "ring5",
+    "region": "transition",
+    "name": "BFSeg14_R5-BF-Quartz_R"
+  },
+  {
+    "detector": 150151,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg1_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150152,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg1_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150153,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg1_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 150251,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg2_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150252,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg2_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150253,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg2_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 150351,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg3_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150352,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg3_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150353,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg3_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 150451,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg4_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150452,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg4_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150453,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg4_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 150551,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg5_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150552,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg5_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150553,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg5_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 150651,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg6_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150652,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg6_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150653,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg6_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 150751,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg7_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150752,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg7_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150753,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg7_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 150851,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg8_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150852,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg8_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150853,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg8_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 150951,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg9_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 150952,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg9_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 150953,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg9_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 151051,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg10_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 151052,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg10_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 151053,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg10_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 151151,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg11_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 151152,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg11_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 151153,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg11_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 151251,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg12_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 151252,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg12_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 151253,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg12_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 151351,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg13_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 151352,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg13_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 151353,
+    "system": "ring5",
+    "region": "closed",
+    "name": "FFSeg13_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 151451,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg14_R5-FF-Quartz_L"
+  },
+  {
+    "detector": 151452,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg14_R5-BF-Quartz_C"
+  },
+  {
+    "detector": 151453,
+    "system": "ring5",
+    "region": "open",
+    "name": "FFSeg14_R5-FF-Quartz_R"
+  },
+  {
+    "detector": 110160,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg1_R6-BF-Quartz"
+  },
+  {
+    "detector": 110260,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg2_R6-BF-Quartz"
+  },
+  {
+    "detector": 110360,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg3_R6-BF-Quartz"
+  },
+  {
+    "detector": 110460,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg4_R6-BF-Quartz"
+  },
+  {
+    "detector": 110560,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg5_R6-BF-Quartz"
+  },
+  {
+    "detector": 110660,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg6_R6-BF-Quartz"
+  },
+  {
+    "detector": 110760,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg7_R6-BF-Quartz"
+  },
+  {
+    "detector": 110860,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg8_R6-BF-Quartz"
+  },
+  {
+    "detector": 110960,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg9_R6-BF-Quartz"
+  },
+  {
+    "detector": 111060,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg10_R6-BF-Quartz"
+  },
+  {
+    "detector": 111160,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg11_R6-BF-Quartz"
+  },
+  {
+    "detector": 111260,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg12_R6-BF-Quartz"
+  },
+  {
+    "detector": 111360,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg13_R6-BF-Quartz"
+  },
+  {
+    "detector": 111460,
+    "system": "ring6",
+    "region": "transition",
+    "name": "BFSeg14_R6-BF-Quartz"
+  },
+  {
+    "detector": 150160,
+    "system": "ring6",
+    "region": "closed",
+    "name": "FFSeg1_R6-FF-Quartz"
+  },
+  {
+    "detector": 150260,
+    "system": "ring6",
+    "region": "open",
+    "name": "FFSeg2_R6-FF-Quartz"
+  },
+  {
+    "detector": 150360,
+    "system": "ring6",
+    "region": "closed",
+    "name": "FFSeg3_R6-FF-Quartz"
+  },
+  {
+    "detector": 150460,
+    "system": "ring6",
+    "region": "open",
+    "name": "FFSeg4_R6-FF-Quartz"
+  },
+  {
+    "detector": 150560,
+    "system": "ring6",
+    "region": "closed",
+    "name": "FFSeg5_R6-FF-Quartz"
+  },
+  {
+    "detector": 150660,
+    "system": "ring6",
+    "region": "open",
+    "name": "FFSeg6_R6-FF-Quartz"
+  },
+  {
+    "detector": 150760,
+    "system": "ring6",
+    "region": "closed",
+    "name": "FFSeg7_R6-FF-Quartz"
+  },
+  {
+    "detector": 150860,
+    "system": "ring6",
+    "region": "open",
+    "name": "FFSeg8_R6-FF-Quartz"
+  },
+  {
+    "detector": 150960,
+    "system": "ring6",
+    "region": "closed",
+    "name": "FFSeg9_R6-FF-Quartz"
+  },
+  {
+    "detector": 151060,
+    "system": "ring6",
+    "region": "open",
+    "name": "FFSeg10_R6-FF-Quartz"
+  },
+  {
+    "detector": 151160,
+    "system": "ring6",
+    "region": "closed",
+    "name": "FFSeg11_R6-FF-Quartz"
+  },
+  {
+    "detector": 151260,
+    "system": "ring6",
+    "region": "open",
+    "name": "FFSeg12_R6-FF-Quartz"
+  },
+  {
+    "detector": 151360,
+    "system": "ring6",
+    "region": "closed",
+    "name": "FFSeg13_R6-FF-Quartz"
+  },
+  {
+    "detector": 151460,
+    "system": "ring6",
+    "region": "open",
+    "name": "FFSeg14_R6-FF-Quartz"
+  },
+  {
+    "detector": 73001,
+    "system": "showermax",
+    "region": "closed"
+  },
+  {
+    "detector": 73002,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73003,
+    "system": "showermax",
+    "region": "open"
+  },
+  {
+    "detector": 73004,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73005,
+    "system": "showermax",
+    "region": "closed"
+  },
+  {
+    "detector": 73006,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73007,
+    "system": "showermax",
+    "region": "open"
+  },
+  {
+    "detector": 73008,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73009,
+    "system": "showermax",
+    "region": "closed"
+  },
+  {
+    "detector": 73010,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73011,
+    "system": "showermax",
+    "region": "open"
+  },
+  {
+    "detector": 73012,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73013,
+    "system": "showermax",
+    "region": "closed"
+  },
+  {
+    "detector": 73014,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73015,
+    "system": "showermax",
+    "region": "open"
+  },
+  {
+    "detector": 73016,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73017,
+    "system": "showermax",
+    "region": "closed"
+  },
+  {
+    "detector": 73018,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73019,
+    "system": "showermax",
+    "region": "open"
+  },
+  {
+    "detector": 73020,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73021,
+    "system": "showermax",
+    "region": "closed"
+  },
+  {
+    "detector": 73022,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73023,
+    "system": "showermax",
+    "region": "open"
+  },
+  {
+    "detector": 73024,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73025,
+    "system": "showermax",
+    "region": "closed"
+  },
+  {
+    "detector": 73026,
+    "system": "showermax",
+    "region": "transition"
+  },
+  {
+    "detector": 73027,
+    "system": "showermax",
+    "region": "open"
+  },
+  {
+    "detector": 73028,
+    "system": "showermax",
+    "region": "transition"
+  }
+]

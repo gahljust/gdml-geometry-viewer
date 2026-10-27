@@ -1,7 +1,14 @@
-build/
 __pycache__/
-*.py[cod]
+*.pyc
 .DS_Store
+build/
+results/
 *.root
-experiment.json
-linux_verification.json
+*_C.d
+*_C.so
+*_C.dll
+*_ACLiC_dict_rdict.pcm
+
+# Visual sources stay local; publish only their PDF exports.
+/docs/visual/
+!/docs/*.pdf
