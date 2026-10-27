@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Start the detector workspace."""
+"""Start the MOLLER Geometry Viewer."""
 import runpy
 import sys
 from pathlib import Path

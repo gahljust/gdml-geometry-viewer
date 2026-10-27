@@ -1,4 +1,4 @@
-# MOLLER detector workspace
+# MOLLER Geometry Viewer
 
 Load remoll geometry and ROOT files; inspect hits, PE signals and deconvolution.
 Files stay on your computer.

@@ -1,4 +1,4 @@
-# Detector workspace
+# MOLLER Geometry Viewer
 
 - Entry: `launch.py` → `geometry/run.py`. Browser: `geometry/index.html`, `view.js`, `deconvolution.js`.
 - GDML: `geometry/export_geometry.cc`. Hits/cuts: `geometry/load_hits.C`.

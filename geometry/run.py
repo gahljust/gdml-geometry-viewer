@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Serve detector geometry, ROOT hit/PE analysis and ROOT deconvolution locally."""
+"""MOLLER Geometry Viewer: local geometry, ROOT hit/PE analysis and deconvolution."""
 import argparse
 import hashlib
 import json
