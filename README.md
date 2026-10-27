@@ -45,9 +45,8 @@ PE/current requires recorded detector entries; all-step files remain usable in H
 **Tests:** see [tests/README.md](tests/README.md) for what each test checks and how to run it.
 Run all: `python3 tests/run.py --remoll "/path/to/remoll"`.
 
-Standalone builds/results stay in `build/`; this research checkout uses
-`rootfiles/local_work/experiments/detector_launcher/geometry-build`.
-`MOLLER_OUTPUT` also overrides the location. **Save view** downloads one JSON;
+Builds and results stay in `build/`. Use `--output` or `MOLLER_OUTPUT`
+to choose another directory. **Save view** downloads one JSON;
 recent selections use bounded memory, with no automatic saved-analysis archive.
 ROOT/GDML and local response code run natively; use trusted files and code.
 

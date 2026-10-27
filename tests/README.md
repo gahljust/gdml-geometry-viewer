@@ -65,15 +65,3 @@ python3 tests/test_geometry.py http://127.0.0.1:8786 "/path/to/remoll"
 
 Checks 224 main tiles, 28 ShowerMax planes, valid geometry and repeat/error loads.
 Stop the test server with Ctrl+C.
-
-## Local research checks
-
-These are additional development tools used in our local remoll research checkout.
-They rely on reference analysis code, production data or directory layouts that
-are not included in the shared app. They are not run by `tests/run.py` and are
-not needed to check your installation. All three tools below stay in our local
-workspace and are omitted from the shared package.
-
-- `python3 tests/test_known_solvers.py`: compares both solvers with closed-form and Poisson cases; requires PyROOT, NumPy and the reference solver.
-- `python3 tests/verify_root.py`: production-data parity and deliberately invalid inputs; requires PyROOT, NumPy and local reference data/code.
-- `python3 tests/make_display_fixture.py`: creates two synthetic display ROOT files after geometry is loaded; requires the remoll checkout and its `develop` branch. This makes fixtures, not a pass/fail test.
