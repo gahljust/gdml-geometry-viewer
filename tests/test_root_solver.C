@@ -8,6 +8,29 @@ void close_matrix(const TMatrixD& a,const TMatrixD& b){
 }
 void test_root_solver(){
     using namespace root_deconv;const int n=6,d=7,dim=14;
+    CenteredScore constant,nearConstant,withZeros;
+    std::vector<double> nearScores;
+    for(int i=0;i<50;i++){
+        constant.add(1./50);
+        double x=(1.+(i%2?1e-7:-1e-7))/50;nearConstant.add(x);nearScores.push_back(x);
+        if(i<10)withZeros.add(1./50);
+    }
+    if(constant.variance_of_sum(50)!=0)throw std::runtime_error("Constant-score variance is not exactly zero");
+    long double mean=0,oracle=0;for(double x:nearScores)mean+=x;mean/=50;
+    for(double x:nearScores)oracle+=(x-mean)*(x-mean);oracle*=50.L/49;
+    if(std::abs(nearConstant.variance_of_sum(50)/oracle-1)>1e-9)throw std::runtime_error("Small real variance was lost");
+    if(std::abs(withZeros.variance_of_sum(50)-.0032*50/49)>1e-15)throw std::runtime_error("Implicit zero histories were lost");
+    CenteredScore sparseX,sparseY;CenteredPair sparsePair;
+    std::vector<std::pair<double,double>> sparse;
+    long double mx=0,my=0,expectedCross=0;
+    for(int i=0;i<257;i++){
+        double x=i%7?100000.+(i%3)*.01:0,y=i%5?-10*x+(i%13)*.005:0;
+        sparse.emplace_back(x,y);sparseX.add(x);sparseY.add(y);sparsePair.add(x,y);mx+=x;my+=y;
+    }
+    mx/=sparse.size();my/=sparse.size();
+    for(auto xy:sparse)expectedCross+=(xy.first-mx)*(xy.second-my);expectedCross*=257.L/256;
+    if(std::abs(sparsePair.covariance_of_sum(sparseX,sparseY,257)/expectedCross-1)>1e-12)
+        throw std::runtime_error("Sparse pair covariance disagrees with independent centered sum");
     TMatrixD y(5,dim),v(5*dim,5*dim),b(n,n);
     for(int c=0;c<5;c++){
         double ref=20*(c+1);y(c,n)=1e7;y(c,d+n)=1e7*ref;
@@ -50,6 +73,9 @@ void test_root_solver(){
     invalid.ResizeTo(v);invalid=v;invalid(0,1)=invalid(1,0)=2e7;
     rejected=false;try{solve(y,invalid,b);}catch(const std::runtime_error&){rejected=true;}
     if(!rejected)throw std::runtime_error("Indefinite MC covariance was not rejected");
+    invalid=v;invalid(0,0)=-1e-20;
+    rejected=false;try{solve(y,invalid,b);}catch(const std::runtime_error&){rejected=true;}
+    if(!rejected)throw std::runtime_error("Negative MC covariance was silently clamped");
     // A false global rate normalization has a known, nonzero effect on the fit.
     TMatrixD twiceY=y,twiceB=b,fourV=v;twiceY*=2;twiceB*=2;fourV*=4;
     auto twice=solve(twiceY,fourV,twiceB);
@@ -80,4 +106,5 @@ void test_root_solver(){
     std::cout<<"PASS: six-component background extension matches closed-form covariance\n";
     std::cout<<"PASS: ROOT independent limit, gain invariance, singular/invalid input rejection and false-rate scaling\n";
     std::cout<<"PASS: exact statistical sigmas 1,2,3,4,5 ppb; exact MC sigmas 0.1,0.2,0.3,0.4,0.5 ppb\n";
+    std::cout<<"PASS: stable constant/small variances and implicit zero histories; invalid covariance still rejected\n";
 }

@@ -70,3 +70,9 @@ choose the wrong bin or the unit fallback near threshold. Both PE maps and the
 deconvolution now use `hit.e`; kinetic-energy cuts are unchanged. Tests use the
 actual energy tables at low energies, a bin boundary and high energy. Previously
 saved PE results need reanalysis; the effect on production totals is not yet measured.
+
+Finite-MC covariance previously subtracted nearly equal raw moments. Constant
+scores could produce a tiny negative variance and reject valid input. The ROOT
+scanner now accumulates centered scalar/pair moments, including implicit zero
+histories and cross-category covariance. This changes numerical evaluation, not
+the estimator; negative or indefinite input covariance is still rejected.

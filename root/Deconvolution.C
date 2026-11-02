@@ -204,7 +204,27 @@ inline Input inspect(const fs::path& path,const std::vector<int>& ids,bool mainP
     r.transportDetails=transport_details(*data,r.macro);
     return r;
 }
-inline portable_deconv::Moments scan(const Input& input,const std::vector<int>& ids,const portable_deconv::Fits& sm,
+struct ScannedMoments:portable_deconv::Moments {
+    std::vector<CenteredScore> centered;
+    std::vector<CenteredPair> pairs;
+    static size_t pair_index(int c,int i,int j,int dim){
+        return size_t(c)*dim*(dim-1)/2+size_t(i)*(2*dim-i-1)/2+j-i-1;
+    }
+    void add_pair(int c,int i,int j,int dim,double x,double y){
+        if(i<j)pairs[pair_index(c,i,j,dim)].add(x,y);
+    }
+    double mc_covariance(int c,int i,int other,int j,int dim,long long histories)const{
+        const double vi=centered.at(c*dim+i).variance_of_sum(histories);
+        const double vj=centered.at(other*dim+j).variance_of_sum(histories);
+        // A score known to be constant has exactly zero covariance with every score.
+        if(vi==0||vj==0)return 0;
+        if(c==other&&i==j)return vi;
+        if(c!=other)return static_cast<double>(-static_cast<long double>(y[c*dim+i])*y[other*dim+j]/(histories-1));
+        if(i>j)std::swap(i,j);
+        return pairs.at(pair_index(c,i,j,dim)).covariance_of_sum(centered[c*dim+i],centered[c*dim+j],histories);
+    }
+};
+inline ScannedMoments scan(const Input& input,const std::vector<int>& ids,const portable_deconv::Fits& sm,
                                     MainModel* main,double minimumK){
     TFile file(input.path.string().c_str(),"READ");auto* tree=file.Get<TTree>("T");
     auto has=[&](const char* key){return tree->GetLeaf(key)||tree->GetBranch(key);};
@@ -216,7 +236,8 @@ inline portable_deconv::Moments scan(const Input& input,const std::vector<int>& 
     auto optional=[&](const char* key){return main?std::make_unique<TTreeReaderArray<double>>(reader,key):nullptr;};
     auto z=optional("hit.z"),xl=optional("hit.xl"),yl=optional("hit.yl"),zl=optional("hit.zl"),px=optional("hit.px"),py=optional("hit.py");
     const int n=ids.size(),d=n+1,dim=2*d,nc=input.process==2?3:1;
-    portable_deconv::Moments out;out.y.resize(nc*dim);out.cross.resize(nc*dim*dim);out.noise.resize(n*n);out.coverage.resize(n);
+    ScannedMoments out;out.y.resize(nc*dim);out.cross.resize(nc*dim*dim);out.noise.resize(n*n);out.coverage.resize(n);out.centered.resize(nc*dim);
+    out.pairs.resize(size_t(nc)*dim*(dim-1)/2);
     std::map<int,int> index;for(int i=0;i<n;i++)index[ids[i]]=i;
     while(reader.Next()){
         ++out.entries;
@@ -255,10 +276,14 @@ inline portable_deconv::Moments scan(const Input& input,const std::vector<int>& 
         std::vector<int> nz;for(int i=0;i<d;i++)if(q[i])nz.push_back(i);
         for(int i:nz){
             double yi=*rate*q[i];out.y[c*dim+i]+=yi;out.y[c*dim+d+i]+=yi*(*asym);
+            out.centered[c*dim+i].add(yi);out.centered[c*dim+d+i].add(yi*(*asym));
             for(int j:nz){
                 double yy=yi*(*rate)*q[j];int off=c*dim*dim;
                 out.cross[off+i*dim+j]+=yy;out.cross[off+i*dim+d+j]+=yy*(*asym);
                 out.cross[off+(d+i)*dim+j]+=yy*(*asym);out.cross[off+(d+i)*dim+d+j]+=yy*(*asym)*(*asym);
+                double yj=*rate*q[j],ai=yi*(*asym),aj=yj*(*asym);
+                out.add_pair(c,i,j,dim,yi,yj);out.add_pair(c,i,d+j,dim,yi,aj);
+                out.add_pair(c,d+i,j,dim,ai,yj);out.add_pair(c,d+i,d+j,dim,ai,aj);
                 if(i<n&&j<n)out.noise[i*n+j]+=*rate*q[i]*q[j];
             }
         }
@@ -346,8 +371,7 @@ void Deconvolution(const char* inputs,const char* output="deconvolution.root",bo
             for(int c=0;c<nc;c++)for(int i=0;i<dim;i++)sums(first+c,i)+=factor*m.y[c*dim+i];
             // MC covariance: centered squared-weight moments, including zero scores.
             for(int c=0;c<nc;c++)for(int e=0;e<nc;e++)for(int i=0;i<dim;i++)for(int j=0;j<dim;j++){
-                double value=-m.y[c*dim+i]*m.y[e*dim+j]/(file.events-1);
-                if(c==e)value+=m.cross[c*dim*dim+i*dim+j]*file.events/(file.events-1);
+                double value=m.mc_covariance(c,i,e,j,dim,file.events);
                 mc((first+c)*dim+i,(first+e)*dim+j)+=factor*factor*value;
             }
             // Physical second moment B: one event rate weight.

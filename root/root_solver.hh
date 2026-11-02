@@ -12,6 +12,55 @@
 #include <stdexcept>
 #include <vector>
 namespace root_deconv {
+// Center scalar event scores without subtracting two almost equal raw moments.
+// Only nonzero scores need updates; skipped histories are merged as a zero group.
+struct CenteredScore {
+    long long count=0;
+    long double origin=0,mean=0,m2=0;
+    long double average()const{return origin+mean;}
+    void add(double value){
+        if(!std::isfinite(value))throw std::runtime_error("Nonfinite MC score");
+        if(value==0)return;
+        if(!count)origin=value;
+        ++count;long double delta=(static_cast<long double>(value)-origin)-mean;
+        m2+=delta*delta*(count-1)/count;mean+=delta/count;
+    }
+    double variance_of_sum(long long histories)const{
+        if(histories<2||count>histories)throw std::runtime_error("Invalid MC history count");
+        const long double centered=m2+average()*average()*count*(histories-count)/histories;
+        return static_cast<double>(centered*histories/(histories-1));
+    }
+};
+// Center the histories where both scores are nonzero, then merge the one-score
+// and zero-score groups. This keeps sparse scans sparse, including implicit zeros.
+struct CenteredPair {
+    long long count=0;
+    long double origin_x=0,origin_y=0,mean_x=0,mean_y=0,cross=0;
+    void add(double x,double y){
+        if(x==0||y==0)return;
+        if(!count){origin_x=x;origin_y=y;}
+        ++count;long double dx=(static_cast<long double>(x)-origin_x)-mean_x;
+        long double dy=(static_cast<long double>(y)-origin_y)-mean_y;
+        cross+=dx*dy*(count-1)/count;mean_x+=dx/count;mean_y+=dy/count;
+    }
+    double covariance_of_sum(const CenteredScore& x,const CenteredScore& y,long long histories)const{
+        if(histories<2||count>x.count||count>y.count||x.count+y.count-count>histories)
+            throw std::runtime_error("Invalid joint MC history count");
+        long long used=count;
+        const long double joint_x=origin_x+mean_x,joint_y=origin_y+mean_y;
+        long double mx=joint_x,my=joint_y,centered=cross;
+        auto merge=[&](long long n,long double ax,long double ay){
+            if(!n)return;
+            long double dx=ax-mx,dy=ay-my,fraction=static_cast<long double>(n)/(used+n);
+            centered+=dx*dy*used*fraction;mx+=dx*fraction;my+=dy*fraction;used+=n;
+        };
+        long long only_x=x.count-count,only_y=y.count-count;
+        if(only_x)merge(only_x,x.average()+count*(x.average()-joint_x)/only_x,0);
+        if(only_y)merge(only_y,0,y.average()+count*(y.average()-joint_y)/only_y);
+        merge(histories-x.count-y.count+count,0,0);
+        return static_cast<double>(centered*histories/(histories-1));
+    }
+};
 struct Fit {
     TMatrixD rates,F,F_mc_sigma,H,B,C,correlation,M;
     TMatrixD experimental_covariance,mc_covariance,combined_covariance;

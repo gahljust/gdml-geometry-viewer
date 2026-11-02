@@ -126,5 +126,49 @@ void test_root_inputs(const char* scratch){
     try{Deconvolution((dir/"fields.txt").string().c_str(),(dir/"bad-field.root").string().c_str(),false);}
     catch(const std::exception& e){rejected=std::string(e.what()).find("Incompatible transport")!=std::string::npos;}
     if(!rejected||fs::exists(dir/"bad-field.root"))throw std::runtime_error("Public macro did not reject incompatible fields before scanning");
+    // Actual ROOT scans: constant, almost constant, zero-hit and partitioned scores.
+    for(int scenario=0;scenario<4;scenario++){
+        fs::path path=dir/("centered-"+std::to_string(scenario)+".root");
+        const int N=50,dim=4,nc=scenario==3?3:1;
+        std::vector<std::vector<double>> scores(N,std::vector<double>(nc*dim));
+        {
+            TFile file(path.string().c_str(),"RECREATE");TTree tree("T","Centered MC regression");
+            int n=1,det[1]={150252},pid[1]={11};
+            double rate=1./N,asym=50,w2=1.44e6;
+            double k[1]={100},e[1]={100.51099895},x[1]={std::cos(M_PI/7)},y[1]={std::sin(M_PI/7)},pz[1]={100};
+            tree.Branch("n",&n,"n/I");tree.Branch("rate",&rate);tree.Branch("ev.A",&asym);tree.Branch("ev.W2",&w2);
+            tree.Branch("hit.det",det,"hit.det[n]/I");tree.Branch("hit.pid",pid,"hit.pid[n]/I");
+            for(auto field:std::initializer_list<std::pair<const char*,double*>>{{"k",k},{"e",e},{"x",x},{"y",y},{"pz",pz}})
+                tree.Branch((std::string("hit.")+field.first).c_str(),field.second,(std::string("hit.")+field.first+"[n]/D").c_str());
+            for(int event=0;event<N;event++){
+                rate=(1.+(scenario==1?(event%2?1e-7:-1e-7):0.))/N;
+                n=scenario==2&&event>=10?0:1;
+                int c=scenario==3?event%3:0;const double masses[]={1.2,1.8,3.};w2=masses[c]*masses[c]*1e6;
+                if(n){scores[event][c*dim]=scores[event][c*dim+1]=rate;scores[event][c*dim+2]=scores[event][c*dim+3]=rate*asym;}
+                tree.Fill();
+            }
+            tree.Write();
+        }
+        Input input;input.path=path;input.events=N;input.process=scenario==3?2:0;
+        auto moments=scan(input,{150252},{},nullptr,1.);
+        std::vector<long double> means(nc*dim);
+        for(const auto& row:scores)for(int i=0;i<nc*dim;i++)means[i]+=static_cast<long double>(row[i])-scores[0][i];
+        for(auto& mean:means)mean/=N;
+        TMatrixD cov(nc*dim,nc*dim);
+        for(int i=0;i<nc*dim;i++)for(int j=0;j<nc*dim;j++){
+            long double expected=0;for(const auto& row:scores)expected+=(static_cast<long double>(row[i])-scores[0][i]-means[i])*(static_cast<long double>(row[j])-scores[0][j]-means[j]);expected*=static_cast<long double>(N)/(N-1);
+            cov(i,j)=moments.mc_covariance(i/dim,i%dim,j/dim,j%dim,dim,N);
+            if(std::abs(cov(i,j)-expected)>1e-8L*std::max(std::abs(expected),1e-30L)){
+                std::cerr<<std::setprecision(17)<<"scenario "<<scenario<<" entry "<<i<<","<<j<<" actual "<<cov(i,j)<<" expected "<<expected<<"\n";
+                throw std::runtime_error("Stable scan covariance disagrees with centered oracle");
+            }
+        }
+        if(nc==1){
+            TMatrixD sums(1,dim),b(1,1);for(int i=0;i<dim;i++)sums(0,i)=moments.y[i];b(0,0)=moments.noise[0];
+            auto fit=solve(sums,cov,b);
+            if(scenario==0&&fit.mc_covariance(0,0)!=0)throw std::runtime_error("Constant ROOT histories acquired MC variance");
+        }
+    }
+    std::cout<<"PASS: centered ROOT covariance, constant/near-constant scores, zero histories and inelastic partitions\n";
     std::cout<<"PASS: real ROOT metadata preserves entry recording; mixed generation domains rejected by public macro\n";
 }

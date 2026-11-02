@@ -29,13 +29,13 @@ Replace `solver` with any name below. Each runs the listed file in `tests/`.
 
 | `--only` | Test file | Checks |
 |---|---|---|
-| `solver` | `test_root_solver.C` | Known statistical σ = 1–5 ppb and MC σ = 0.1–0.5 ppb; invalid and singular matrices. |
-| `root-inputs` | `test_root_inputs.C` | Synthetic ROOT metadata, incompatible runs, detector settings and malformed PE tables. |
+| `solver` | `test_root_solver.C` | Known statistical σ = 1–5 ppb and MC σ = 0.1–0.5 ppb; stable sparse moments; invalid and singular matrices. |
+| `root-inputs` | `test_root_inputs.C` | Synthetic ROOT metadata, detector settings and PE tables; constant/near-constant scores, zero-hit events and inelastic cross-category covariance. |
 | `responses` | `test_response_sources.py` | Bundled/local response resources and invalid inputs. |
 | `cache` | `test_result_cache.py` | In-memory reuse, invalidation and no automatic disk cache. |
 | `launch` | `test_launch.py` | Dependency discovery, paths and launcher options. |
 | `package` | `test_package.py` | Exported files, hashes, launch command and exclusion of local artifacts. |
-| `pe` | `test_weighted_maps.py` | Known 90 + 66 = 156 PE/s through ROOT; multi-file normalization and input rejection. |
+| `pe` | `test_weighted_maps.py` | Known 90 + 66 = 156 PE/s; actual energy tables through maps and deconvolution, bin boundaries, kinetic cuts, multi-file normalization and input rejection. |
 | `hits` | `test_hit_loader.py` | Cuts, histogram bins, units, malformed files and recovery. |
 | `saved-view` | `test_save_view.js` | Saved-view contents and display units. |
 
