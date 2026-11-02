@@ -30,6 +30,16 @@ The projected statistical uncertainty of each extracted asymmetry is the square
 root of its diagonal entry in `M⁻¹`. Finite simulation uncertainty propagates
 through H separately.
 
+These are conditional forecasts. C is estimated from simulation and then treated
+as fixed; its estimation uncertainty is not propagated. MC through H uses a
+first-order approximation, which can fail when MC variations make the components
+indistinguishable. Numerical invertibility alone does not establish reliable
+uncertainty intervals. Expected PE products include variation between simulated
+histories, but omit additional optical, photoelectron-counting and electronics
+fluctuations. Combined adds only the displayed statistical and linear-MC terms;
+it is not a complete experimental error budget. Production impact of these
+approximations requires separate validation.
+
 Deconvolution requires compatible run metadata and detector coverage.
 Missing information is reported, not treated as zero. Compatibility compares saved
 source, geometry, field hashes and ordered transport commands, including macro

@@ -244,7 +244,7 @@ function render(){
  document.querySelectorAll('[data-matrix]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.matrix===matrix)));
  const m=result.matrices,labels=result.labels;
  if(matrix==='uncertainties'){
-  host.append(table(['Interaction','Experimental σ [ppb]','MC σ [ppb]','Combined σ [ppb]'],labels.map((name,i)=>[name,...['experimental_covariance','mc_covariance','combined_covariance'].map(k=>fmt(Math.sqrt(Math.max(0,m[k][i][i]))))]),'Projected statistical uncertainty; MC uncertainty propagated through H.'));
+  host.append(table(['Interaction','Projected σ [ppb]','MC through H σ [ppb]','Combined σ [ppb]'],labels.map((name,i)=>[name,...['experimental_covariance','mc_covariance','combined_covariance'].map(k=>fmt(Math.sqrt(Math.max(0,m[k][i][i]))))]),'Forecast: C treated as fixed; linear MC through H; no additional optical or electronics noise.'));
  }else if(matrix==='C'||matrix==='correlation'){
   const a=m[matrix],canvas=el('canvas');canvas.width=canvas.height=a.length;canvas.setAttribute('aria-label',matrix==='C'?'Detector asymmetry covariance':'Detector correlation matrix');
   const ctx=canvas.getContext('2d'),data=ctx.createImageData(a.length,a.length);let max=matrix==='correlation'?1:Math.max(...a.map(row=>Math.max(...row.map(Math.abs))));
