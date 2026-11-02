@@ -303,7 +303,7 @@ void load_hits(const char* input = nullptr, const char* output = nullptr, const 
                         h.x=responseValue("hit.x",hit);h.y=responseValue("hit.y",hit);h.z=responseValue("hit.z",hit);
                         h.xl=responseValue("hit.xl",hit);h.yl=responseValue("hit.yl",hit);h.zl=responseValue("hit.zl",hit);
                         h.px=responseValue("hit.px",hit);h.py=responseValue("hit.py",hit);h.pz=pzValue;
-                        pe=mainPE.pe(h,responseValue("hit.k",hit));
+                        pe=mainPE.pe(h,responseValue("hit.e",hit));
                     }else ++unsupportedPE;
                 }else ++unsupportedPE;
                 if(rate->GetNdata()!=1||!std::isfinite(rate->GetValue())||rate->GetValue()<0)throw std::runtime_error("Invalid stored event rate.");

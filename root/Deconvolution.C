@@ -246,7 +246,7 @@ inline portable_deconv::Moments scan(const Input& input,const std::vector<int>& 
                 if(std::abs(pid[j])!=11||pz[j]<=0||k[j]<=1.1)continue;
                 root_main_pe::remollGenericDetectorHit_t h;
                 h.det=det[j];h.x=x[j];h.y=y[j];h.z=(*z)[j];h.xl=(*xl)[j];h.yl=(*yl)[j];h.zl=(*zl)[j];h.px=(*px)[j];h.py=(*py)[j];h.pz=pz[j];
-                q[i]+=main->pe(h,k[j]);
+                q[i]+=main->pe(h,e[j]);
             }
         }
         int c=0;

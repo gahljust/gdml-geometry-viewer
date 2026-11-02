@@ -61,3 +61,12 @@ for main tiles and ShowerMax. `inputs.txt` lists one ROOT path per line.
 Use forward slashes in Windows paths at the ROOT prompt.
 The app calls these same analyzers and converts results to browser JSON; it does
 not require the manual commands. See the macro for optional arguments and cuts.
+
+## Corrections — 2026-11-02
+
+Main-detector PE weighting previously passed kinetic energy (`hit.k`) to the
+response table, whose documented input is total energy (`hit.e`). This could
+choose the wrong bin or the unit fallback near threshold. Both PE maps and the
+deconvolution now use `hit.e`; kinetic-energy cuts are unchanged. Tests use the
+actual energy tables at low energies, a bin boundary and high energy. Previously
+saved PE results need reanalysis; the effect on production totals is not yet measured.

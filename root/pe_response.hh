@@ -29,14 +29,15 @@ struct MainModel {
         for(const auto& p:positions)position[r].push_back({p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7],p[8],p[9],p[10],p[11],p[12]});
         for(const auto& e:energies)energy[r].push_back({e[0],e[1]});
     }}
-    double pe(root_main_pe::remollGenericDetectorHit_t h,double kinetic){
+    // The vendor energy table takes total energy (hit.e), not kinetic energy.
+    double pe(root_main_pe::remollGenericDetectorHit_t h,double totalEnergy){
         if(!detector_selection::main_quartz(h.det))throw std::runtime_error("Unknown main quartz detector: "+std::to_string(h.det));
         int suffix=h.det%100,ring=suffix>=51&&suffix<=53?4:suffix/10-1;
         if(ring<0||ring>=6)throw std::runtime_error("Unknown main quartz detector");
         auto angle=root_main_pe::convert_labframe_to_local_thinquartz(h);
         const double offset[]={15,30,30,60,70,50};
         double value=root_main_pe::cal_PE(h.xl,h.yl+offset[ring],std::min(angle.lpolar,4.),angle.lazimuthal,position[ring]);
-        return value<0?0:value*root_main_pe::cal_PE_energy(kinetic,energy[ring]);
+        return value<0?0:value*root_main_pe::cal_PE_energy(totalEnergy,energy[ring]);
     }
 };
 }

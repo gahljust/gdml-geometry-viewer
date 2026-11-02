@@ -27,16 +27,19 @@ def main():
   maker=base/'Make.C'
   maker.write_text('#include '+json.dumps(str(HERE/'Deconvolution.C'))+'\n'+r'''
 void Make(){
- for(int seed=1;seed<=13;++seed){
+ for(int seed=1;seed<=19;++seed){
   std::string path=std::string(gSystem->Getenv("FIXTURE_DIR"))+"/"+std::to_string(seed)+".root";
   TFile f(path.c_str(),"RECREATE");TTree t("T","known weighted hits");
   int n=0,det[4],pid[4];double rate,x[4],y[4],z[4],xl[4],yl[4],zl[4],px[4],py[4],pz[4],k[4],e[4];
   t.Branch("n",&n,"n/I");t.Branch("rate",&rate);
+  double asym=50,w2=1e6;t.Branch("ev.A",&asym);t.Branch("ev.W2",&w2);
   t.Branch("hit.det",det,"hit.det[n]/I");t.Branch("hit.pid",pid,"hit.pid[n]/I");
   #define FIELD(a) t.Branch("hit." #a,a,"hit." #a "[n]/D")
   FIELD(x);FIELD(y);FIELD(z);FIELD(xl);FIELD(yl);FIELD(zl);FIELD(px);FIELD(py);FIELD(pz);FIELD(k);FIELD(e);
   for(int j=0;j<4;j++){pid[j]=11;x[j]=1100;y[j]=0;z[j]=28000;xl[j]=yl[j]=zl[j]=px[j]=py[j]=0;pz[j]=100;k[j]=100;e[j]=1000;}
-  n=3;rate=2;det[0]=det[1]=150252;det[2]=73001;if(seed==7)det[0]=det[1]=150010;t.Fill();
+  n=3;rate=2;det[0]=det[1]=150252;det[2]=73001;if(seed==7)det[0]=det[1]=150010;
+  if(seed>=14){const double kinetic[]={1.2,3.2,2.999,3.001,1500,1.05};n=1;k[0]=kinetic[seed-14];e[0]=k[0]+.51099895;pz[0]=std::sqrt(k[0]*(k[0]+2*.51099895));}
+  t.Fill();
   n=1;rate=5;t.Fill();n=0;rate=0;t.Fill();t.Write();
   remollRunData d;d.fNthrown=3;d.fSeed=seed;d.fGitInfo="known-rate-test";
   std::string macro="/remoll/evgen/set moller\n/remoll/beamcurr 65 uA\n/run/beamOn 3\n";
@@ -70,6 +73,30 @@ void Make(){
    assert math.isclose(data['detector_signal']['150252'],90,rel_tol=1e-12)
    assert math.isclose(data['detector_signal']['73001'],66,rel_tol=1e-12)
    print('PASS',len(files),'file(s): main 90 + ShowerMax 66 = 156 PE/s')
+  # Keep the actual energy table: unit-factor fixtures cannot detect E versus K.
+  energy_tables=base/'real-energy-tables';shutil.copytree(tables,energy_tables)
+  for path in (HERE/'data/main_pe').glob('*_EnergyDepTable.csv'):shutil.copy2(path,energy_tables/path.name)
+  energy_source=responses.resolve(dict(mode='local',remoll=str(base/'remoll'),main_tables=str(energy_tables)))
+  with (energy_tables/'r5_EnergyDepTable.csv').open() as f:
+   rows=list(csv.reader(f));first,second=float(rows[1][1]),float(rows[2][1])
+  # Total energies bracket the first bin edge (3.511 MeV); K retains the cuts.
+  expected=[first,second,first,second,1.,0.]
+  for seed,factor in enumerate(expected,14):
+   run.load_hit_file([base/f'{seed}.root'],'1',response=energy_source)
+   data=run.state['hits']['result'];assert data is not None,run.state['hits']['message']
+   assert math.isclose(data['signal_total'],70*factor,rel_tol=1e-12,abs_tol=1e-12),(seed,data['signal_total'],70*factor)
+  scan_check=base/'EnergyScan.C'
+  scan_check.write_text('#include '+json.dumps(str(HERE/'Deconvolution.C'))+'\nvoid EnergyScan(){\n'+
+   'root_deconv::MainModel model('+json.dumps(str(energy_tables))+');\n'+
+   'const double factors[]={'+','.join(map(repr,expected))+'};\n'+
+   'for(int j=0;j<6;j++){root_deconv::Input input;input.path=std::filesystem::path('+json.dumps(str(base))+')/(std::to_string(j+14)+".root");input.events=3;input.process=0;\n'+
+   'auto m=root_deconv::scan(input,{150252},{},&model,1.);double pe=10*factors[j];\n'+
+   'auto check=[](double a,double b){if(std::abs(a-b)>1e-10*(1+std::abs(b)))throw std::runtime_error("PE energy scan mismatch");};\n'+
+   'check(m.y[0],7*pe);check(m.y[2],350*pe);check(m.noise[0],7*pe*pe);check(m.cross[0],29*pe*pe);}\n'+
+   'std::cout<<"PASS real energy tables through deconvolution scan\\n";}\n')
+  p=subprocess.run(['root','-n','-l','-b','-q',str(scan_check)+'+'],capture_output=True,text=True)
+  assert p.returncode==0 and 'PASS real energy tables' in p.stdout,p.stdout+p.stderr
+  print('PASS total-energy PE lookup through maps and deconvolution; bin edges, kinetic cut and high-energy limit')
   run.load_hit_file([base/'1.root',base/'1.root'],'1',response=selected)
   assert run.state['hits']['result'] is None
   assert 'Repeated seed' in run.state['hits']['message'],run.state['hits']['message']
