@@ -25,6 +25,12 @@
 namespace root_deconv {
 namespace fs=std::filesystem;
 const char* component_names[]={"Moller","ep elastic","ep inelastic Delta","ep inelastic resonance","ep inelastic continuum"};
+// Physical Ring 5 Open membership: 7 even FF sectors, 3 placements each.
+// Replaces the legacy deconvolution angular cut for the asymmetry reference in H.
+inline bool ring5_open_reference(int det){
+    const int sector=(det%10000)/100,suffix=det%100;
+    return det>=150000&&det<152000&&sector>=1&&sector<=14&&sector%2==0&&suffix>=51&&suffix<=53;
+}
 inline std::string text(const fs::path& p){std::ifstream f(p);if(!f)throw std::runtime_error("Cannot open "+p.string());return std::string(std::istreambuf_iterator<char>(f),{});}
 inline std::string trim(std::string s){auto a=s.find_first_not_of(" \t\r\n");return a==s.npos?"":s.substr(a,s.find_last_not_of(" \t\r\n")-a+1);}
 inline std::string digest(const fs::path& p){std::unique_ptr<TMD5> h(TMD5::FileChecksum(p.string().c_str()));if(!h)throw std::runtime_error("Cannot fingerprint "+p.string());return h->AsString();}
@@ -259,9 +265,8 @@ inline ScannedMoments scan(const Input& input,const std::vector<int>& ids,const 
             }else{
                 // Main quartz cuts: charged particles, kinetic energy >= 1 MeV.
                 if(!portable_deconv::charged(pid[j])||k[j]<minimumK)continue;
-                int suffix=det[j]%100;double phi=std::fmod(std::atan2(y[j],x[j])+2*M_PI,2*M_PI/7);
                 // Reference stays crossing-weighted in both PE and crossing modes.
-                if(suffix>=51&&suffix<=53&&phi>=3*M_PI/28&&phi<5*M_PI/28)q[n]+=1;
+                if(ring5_open_reference(det[j]))q[n]+=1;
                 if(!main){q[i]+=1;continue;}
                 // Upstream main-PE model support restrictions.
                 if(std::abs(pid[j])!=11||pz[j]<=0||k[j]<=1.1)continue;
@@ -356,6 +361,7 @@ void Deconvolution(const char* inputs,const char* output="deconvolution.root",bo
         TMatrixD sums(components,dim),mc(components*dim,components*dim),b(n,n);std::vector<double> coverage(n);
         auto sm=portable_deconv::load(smFolder.string());std::unique_ptr<MainModel> model;if(mainPE)model=std::make_unique<MainModel>(mainFolder);
         std::ostringstream provenance;provenance<<std::setprecision(17)<<"ROOT "<<gROOT->GetVersion()<<"\nMode: "<<(mainPE?"main PE + ShowerMax PE":"main crossings + ShowerMax PE")<<"\nMain charged K >= "<<minimumK<<" MeV; main PE also forward e+/- K > 1.1, polar capped at 4 degrees\nShowerMax forward supported PE\nEntries and re-entries; exits absent by producer recording\nForecast "<<beamDays<<" days, polarization "<<polarization<<", current "<<current_uA<<" uA\nMC propagated through H at simulated reference; experimental C fixed\nExpected mean PE; no additional optical/electronics/beam noise or model systematic uncertainty\n";
+        provenance<<"H asymmetry reference: physical Ring 5 Open tiles; charged K >= minimumK, both directions, rate-weighted crossings. Legacy angular deconvolution cut replaced.\n";
         provenance<<"Deconvolution.C MD5 "<<digest(here/"root/Deconvolution.C")<<"\nroot_solver.hh MD5 "<<digest(here/"root/root_solver.hh")<<"\nmetadata_schema.hh MD5 "<<digest(here/"root/metadata_schema.hh")<<"\n";
         provenance<<"Main PE tables "<<mainFolder<<"\nShowerMax tables "<<smFolder<<"\n";
 #ifdef MOLLER_MAIN_LOOKUP_HEADER
@@ -382,7 +388,8 @@ void Deconvolution(const char* inputs,const char* output="deconvolution.root",bo
         for(int i=0;i<n;i++)if(!coverage[i])throw std::runtime_error("No recorded hits in detector "+std::to_string(ids[i]));
         auto fit=solve(sums,mc,b,beamDays,polarization);
         TFile result(output,"CREATE");if(result.IsZombie())throw std::runtime_error("Cannot create output ROOT file");
-        write_fit(result,fit,ids,sums,provenance.str(),labels);result.Close();
+        write_fit(result,fit,ids,sums,provenance.str(),labels);
+        mc.Write("rate_asymmetry_mc_covariance");result.Close();
         std::cout<<"\n"<<events<<" events; "<<n<<" detector channels. Uncertainties [ppb]:\n"<<"Interaction                  Statistical       MC       Combined\n";
         for(int c=0;c<components;c++)std::cout<<std::left<<std::setw(28)<<labels[c]<<std::right<<std::setw(12)<<std::sqrt(fit.experimental_covariance(c,c))<<std::setw(12)<<std::sqrt(std::max(0.,fit.mc_covariance(c,c)))<<std::setw(12)<<std::sqrt(fit.combined_covariance(c,c))<<"\n";
         std::cout<<"Saved "<<output<<"\n";

@@ -7,5 +7,6 @@
 - PE resources: `app/responses.py`, `data/response-manifest.json`, `vendor/`.
 - Visual guides: `docs/GUIDES.txt`, PDFs in `docs/`. Editable masters in `docs/visual/` stay local; preserve manual edits.
 - Checks: `python3 tests/run.py --remoll /path/to/remoll`; scope in `tests/README.md`.
+- Analysis releases also require the raw-input consistency check against a separately validated reference; matching this app's previous outputs is not sufficient. See `tests/README.md`.
 - Outputs follow `MOLLER_OUTPUT`; never store ROOT/builds in source.
 - Keep text brief and the interface within one frame. No automatic publication.

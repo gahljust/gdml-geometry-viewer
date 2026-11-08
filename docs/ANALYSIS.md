@@ -72,6 +72,21 @@ Use forward slashes in Windows paths at the ROOT prompt.
 The app calls these same analyzers and converts results to browser JSON; it does
 not require the manual commands. See the macro for optional arguments and cuts.
 
+## Correction — 2026-11-08
+
+Fixed a legacy deconvolution angular cut to use the **21 physical Ring 5 Open
+tiles for the asymmetry reference in H**. The reference still uses rate-weighted
+charged crossings with kinetic energy ≥1 MeV (or the configured minimum), in
+both directions, in both main-detector weighting modes. Detector signals,
+dilutions F, and detector covariance C are unchanged by this reference correction.
+Previously calculated reference asymmetries, H, M and fitted uncertainties need
+recalculation. The shared campaign website already uses physical membership;
+this correction is to the standalone launcher's calculation.
+
+ROOT output now includes the full finite-MC input covariance so the complete
+analysis can be checked against an independent implementation. See
+[verification scope](../tests/README.md) and [investigation](REFERENCE_CONSISTENCY.md).
+
 ## Corrections — 2026-11-02
 
 Main-detector PE weighting previously passed kinetic energy (`hit.k`) to the

@@ -11,10 +11,11 @@ HERE = Path(__file__).resolve().parents[1]
 FILES = (
     'README.md', 'AGENTS.md', 'THIRD_PARTY.md', '.gitignore',
     'launch', 'launch.py', 'Start-Mac.command', 'Start-Windows.cmd', 'Deconvolution.C',
-    'app/responses.py', 'docs/ANALYSIS.md', 'docs/GUIDES.txt', 'tests/README.md', 'tests/run.py',
+    'app/responses.py', 'docs/ANALYSIS.md', 'docs/REFERENCE_CONSISTENCY.md', 'docs/GUIDES.txt', 'tests/README.md', 'tests/run.py',
     'tests/test_hit_loader.py', 'tests/test_weighted_maps.py', 'tests/test_geometry.py',
     'tests/test_result_cache.py', 'tests/test_launch.py', 'tests/test_save_view.js', 'tests/test_response_sources.py',
     'tests/test_root_solver.C', 'tests/test_root_inputs.C',
+    'tests/verify_consistency.py',
     'tests/test_package.py', 'tools/build_package.py',
 )
 TREES = {'geometry': {'.py', '.js', '.html', '.cc', '.C', '.txt'},
