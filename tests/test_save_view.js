@@ -1,5 +1,24 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
+// Plot gestures preserve the value under the cursor in either display mode.
+const axes=require('../geometry/plot-axes.js'),curves=require('../geometry/pe-fit-core.js');
+for(const state of [{domain:[-10,30],mode:'linear'},{domain:[.1,1000],mode:'log'}]){
+ const anchor=.37,range=axes.zoomRange(state,anchor,.4),f=state.mode==='log'?Math.log:x=>x;
+ const pivot=f(state.domain[0])+anchor*(f(state.domain[1])-f(state.domain[0]));
+ assert.ok(Math.abs(f(range[0])+anchor*(f(range[1])-f(range[0]))-pivot)<1e-12);
+ assert.ok(axes.scaledRange(state,30,300)[1]<state.domain[1]);
+}
+assert.equal(axes.logRange([-10,0],[-8,0]),null);
+// Fit integrated bins, including negative coordinates and unequal widths.
+const edges=[-10,-8,-6,-5,-4,-3,-2,-1,0,1,2,4,7];
+const bins=edges.slice(0,-1).map((lo,i)=>[(lo+edges[i+1])/2,1200*curves.binShape('gaussian',lo,edges[i+1],[-2,1.5]),lo,edges[i+1]]);
+const original=JSON.stringify(bins);
+for(const scale of [1,1.602176634e-10]){
+ const result=curves.fit({kind:'gaussian',histogram:true,points:bins.map(p=>[p[0],p[1]*scale,p[2],p[3]]),range:[-10,7]});
+ assert.ok(Math.abs(result.params[1]+2)<.001);assert.ok(Math.abs(result.params[2]-1.5)<.001);
+ assert.ok(Math.abs(result.params[0]/scale/1200-1)<.001);
+}
+assert.equal(JSON.stringify(bins),original);
 const {signalAxisValues}=require('../geometry/view.js');
 const bounds={'plot-y-min':'0','plot-y-max':'1e12','plot-x-max':'10'};
 const amps=signalAxisValues(bounds,'pe','current');

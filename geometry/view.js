@@ -123,8 +123,8 @@ function setGeometry(){
 }
 function showApplied(){
  const pending=applied&&($('hit-cut').value.trim()!==applied.cut||$('hit-file').value.trim()!==applied.path);
- $('applied-cut').textContent=applied?(pending?`Currently applied: ${applied.cut}`:'Applied to 3D + distributions · '+(hitData?.unit||'hits')):'No selection applied';
- $('shared-cuts').textContent='Cuts · same selection as 3D';
+ $('applied-cut').textContent=applied?(pending?`Currently applied: ${applied.cut}`:'Applied · '+(hitData?.unit||'hits')):'No selection applied';
+ $('shared-cuts').textContent='Cuts';
  $('charge-help').hidden=!$('hit-cut').value.includes('charged(');
  $('shared-cut-state').textContent=pending?'Edits not applied':!applied?'No selection applied':'';
 }
@@ -132,6 +132,18 @@ const svgNS='http://www.w3.org/2000/svg';
 function svgNode(name,attrs={},text){const n=document.createElementNS(svgNS,name);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(text!==undefined)n.textContent=text;return n;}
 // Display controls never alter selection, weighting, or ROOT histogram bins.
 let plotDimension=1,plotBinning={},binDraft=false;
+let curveLayout=null;
+const plotInteraction=PlotInteractions.create({svg:$('plot'),redraw:()=>{rememberPlotView();renderPlot();},reset:()=>{resetPlot();rememberPlotView();},beforeFit:()=>{
+ showPlotSettings(false);
+ const b=$('plot').getBoundingClientRect();
+ if((b.width<550||b.height<260)&&focusedPanel!=='distribution'){
+  curveLayout={focused:focusedPanel,visible:{...panelVisible}};
+  focusedPanel='distribution';for(const k in panelVisible)panelVisible[k]=k==='distribution';updatePanels();
+ }
+},afterFit:()=>{
+ if(!curveLayout)return;const saved=curveLayout;curveLayout=null;
+ if(focusedPanel==='distribution'){focusedPanel=saved.focused;Object.assign(panelVisible,saved.visible);updatePanels();}
+}});
 const plotViewInputs=['plot-x-min','plot-x-max','plot-y-min','plot-y-max','plot-title','plot-x-label','plot-y-label'];
 const plotViewChecks=['plot-log-x','plot-log-y','plot-log-color','plot-grid-x','plot-grid-y'];
 const plotViews=new Map();let activePlotKey='1:radius';
@@ -167,9 +179,9 @@ function renderPlot(){
  const available=two?pair?.available:kind==='particles'?hitData?.particles_available:kind==='detectors'?!!hitData:h?.available;
  $('plot-log-x').disabled=categorical;for(const id of ['plot-x-min','plot-x-max'])$(id).disabled=categorical;
  $('axis-status').textContent=categorical?'X uses detector or particle categories.':'';
- const fail=message=>{svg.setAttribute('hidden','');empty.hidden=false;empty.textContent=message;};
+ const fail=message=>{plotInteraction.clear();svg.setAttribute('hidden','');empty.hidden=false;empty.textContent=message;};
  showApplied();
- $('plot-note').textContent='Shared ROOT cuts · Unweighted hit counts';
+ $('plot-note').textContent='';$('plot-detail').textContent='Same cuts as 3D.';
  if(!hitData){fail('Load hits to see the distribution.');return;}
  if(!available){fail('Unavailable in one or more files: '+(two?[h?.expression,hy?.expression].filter(Boolean).join(' / '):h?.expression||'hit.pid'));return;}
  svg.removeAttribute('hidden');empty.hidden=true;
@@ -222,14 +234,16 @@ function renderPlot(){
  }else for(const v of ticks(xr,logX,Math.max(2,Math.min(5,Math.floor(pw/70))))){const x=xpos(v);if($('plot-grid-x').checked)svg.append(svgNode('line',{x1:x,x2:x,y1:top,y2:top+ph,stroke:'#a9bdca','stroke-opacity':.35}));text(x,top+ph+14,fmt(v),{'text-anchor':'middle'});}
  svg.append(svgNode('path',{d:`M ${left} ${top} V ${top+ph} H ${W-right}`,fill:'none',stroke:'#7a8c99'}));
  if($('plot-title').value.trim())text(left+pw/2,18,$('plot-title').value.trim(),{'text-anchor':'middle','font-size':14,'font-weight':600});
- text(left+pw/2,H-6,$('plot-x-label').value.trim()||(categorical?plotNames[kind]:h.label),{'text-anchor':'middle'});
- text(12,top+ph/2,$('plot-y-label').value.trim()||(two?hy.label:(hitData.unit||'Hits')+' per bin'),{transform:`rotate(-90 12 ${top+ph/2})`,'text-anchor':'middle'});
+ text(left+pw/2,H-6,($('plot-x-label').value.trim()||(categorical?plotNames[kind]:h.label))+(logX?' · log':''),{'text-anchor':'middle'});
+ text(12,top+ph/2,($('plot-y-label').value.trim()||(two?hy.label:(hitData.unit||'Hits')+' per bin'))+(logY?' · log':''),{transform:`rotate(-90 12 ${top+ph/2})`,'text-anchor':'middle'});
  if(!counts.some(n=>n>0))text(left+pw/2,top+ph/2,'No hits in stored range',{'text-anchor':'middle'});
  const invalid=categorical?(kind==='particles'?hitData.invalid_particles:0):two?pair.invalid:h.invalid;
  const excluded=categorical?0:two?pair.outside:h.underflow+h.overflow;
  const excludedUnit=two?'hits':hitData.unit||'hits';
  const scope=h?.event_value||hy?.event_value?' · Event value per selected hit':'';
- $('plot-note').textContent=(hitData.unit==='nA'?'Cathode current · 65 µA':hitData.weighting==='pe'?'PE rate · 65 µA':'Unweighted hits')+scope+(two?' · '+h.expression+' × '+hy.expression:categorical?'': ' · '+h.expression)+(excluded?` · ${fmt(excluded)} ${excludedUnit} outside stored range`:'')+(invalid?` · ${invalid.toLocaleString()} invalid hits`:'')+(hidden?` · ${fmt(hidden)} ${hitData.unit||'hits'} outside view`:'')+((logX||logY)?' · Log axes':'')+(hitData.weighting==='pe'?' · PE model: main forward e± >1.1 MeV; ShowerMax forward':'');
+ $('plot-detail').textContent='Same cuts as 3D · '+(hitData.unit==='nA'?'Cathode current · 65 µA':hitData.weighting==='pe'?'PE rate · 65 µA':'Unweighted hits')+scope+(two?' · '+h.expression+' × '+hy.expression:categorical?'': ' · '+h.expression)+(excluded?` · ${fmt(excluded)} ${excludedUnit} outside stored range`:'')+(invalid?` · ${invalid.toLocaleString()} invalid hits`:'')+(hidden?` · ${fmt(hidden)} ${hitData.unit||'hits'} outside view`:'')+((logX||logY)?' · Log axes':'')+(hitData.weighting==='pe'?' · PE model: main forward e± >1.1 MeV; ShowerMax forward':'');
+ plotInteraction.update({key:activePlotKey,data:hitData,h:!two&&!categorical?h:null,categorical,xr,yr,logX,logY,left,top,pw,ph,W,H,xpos,ypos,counts,xValues:categorical?[]:h.edges,yValues:two?hy.edges:counts});
+ $('plot-note').textContent=(hitData.unit==='nA'?'nA · 65 µA':hitData.weighting==='pe'?'PE/s · 65 µA':'Hits')+((excluded||invalid||hidden)?' · See range details':'');
 }
 document.querySelectorAll('[data-dimension]').forEach(b=>b.onclick=()=>{
  plotDimension=Number(b.dataset.dimension);document.querySelectorAll('[data-dimension]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
@@ -237,7 +251,7 @@ document.querySelectorAll('[data-dimension]').forEach(b=>b.onclick=()=>{
 });
 let settingsLayout=null;
 function showPlotSettings(open){
- if(open&&!binDraft)syncBinControls();
+ if(open){plotInteraction.close();if(!binDraft)syncBinControls();}
  // A tiny window cannot split a short plot again without crushing both panes.
  // Temporarily use the existing focus layout; closing settings restores it.
  if(open&&document.querySelector('.plotpanel').getBoundingClientRect().height<300&&focusedPanel!=='distribution'){
@@ -307,7 +321,7 @@ async function applyBins(reset=false){
  }catch(error){$('bin-status').textContent=error.message;}
 }
 $('apply-bins').onclick=()=>applyBins();$('reset-bins').onclick=()=>applyBins(true);
-$('plot-export').onclick=()=>{if($('plot').hasAttribute('hidden'))return;const copy=$('plot').cloneNode(true);copy.prepend(svgNode('desc',{},$('plot-note').textContent+'; ROOT cut: '+(applied?.cut||'none')));copy.setAttribute('xmlns',svgNS);copy.setAttribute('width',$('plot').viewBox.baseVal.width);copy.setAttribute('height',$('plot').viewBox.baseVal.height);const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}));const a=document.createElement('a');a.href=url;a.download='distribution.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('plot-export').onclick=()=>{if($('plot').hasAttribute('hidden'))return;const copy=$('plot').cloneNode(true);copy.prepend(svgNode('desc',{},$('plot-detail').textContent+'; ROOT cut: '+(applied?.cut||'none')));copy.setAttribute('xmlns',svgNS);copy.setAttribute('width',$('plot').viewBox.baseVal.width);copy.setAttribute('height',$('plot').viewBox.baseVal.height);const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}));const a=document.createElement('a');a.href=url;a.download='distribution.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 
 async function api(path,data){const response=await fetch(path,data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const result=await response.json();if(!response.ok)throw Error(result.error||'Request failed');return result;}
 function lockControls(){

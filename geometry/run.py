@@ -310,9 +310,9 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 self.reply((OUTPUT / 'geometry.json').read_bytes())
         elif self.path in ['/', '/view.js', '/hit-map-3d.js', '/source/run.py', '/source/export_geometry.cc',
-                           '/source/CMakeLists.txt', '/source/view.js', '/source/index.html', '/deconvolution.js', '/save-view.js']:
+                           '/source/CMakeLists.txt', '/source/view.js', '/source/index.html', '/deconvolution.js', '/save-view.js', '/plot-axes.js', '/pe-fit-core.js', '/plot-interactions.js']:
             name = 'index.html' if self.path == '/' else self.path.rsplit('/', 1)[-1]
-            kind = 'text/html' if self.path == '/' else 'text/javascript' if self.path in ['/view.js','/hit-map-3d.js','/deconvolution.js','/save-view.js'] else 'text/plain'
+            kind = 'text/html' if self.path == '/' else 'text/javascript' if self.path in ['/view.js','/hit-map-3d.js','/deconvolution.js','/save-view.js','/plot-axes.js','/pe-fit-core.js','/plot-interactions.js'] else 'text/plain'
             self.reply((HERE / name).read_bytes(), content_type=kind + '; charset=utf-8')
         else:
             self.reply({'error': 'Not found'}, 404)

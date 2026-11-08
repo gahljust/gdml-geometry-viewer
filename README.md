@@ -3,6 +3,12 @@
 Load remoll geometry and ROOT files; inspect hits, PE signals and deconvolution.
 Files stay on your computer.
 
+**Plots:** drag or scroll over an axis to scale it; double click the axis for
+log/linear, or the plot center to reset. Click a 1D plot for Gaussian, power or
+constant fits with range sliders. Fit controls sit beside the graph; red values
+describe the fitted curve, not a deconvolution result. Double click a 2D color
+scale to switch log/linear. Settings retains labels, binning and SVG export.
+
 In the terminal where ROOT and Geant4 are configured:
 
 ```sh
