@@ -20,6 +20,7 @@ FILES = (
 )
 TREES = {'geometry': {'.py', '.js', '.html', '.cc', '.C', '.txt'},
          'root': {'.C', '.hh', '.h'}, 'data': {'.json', '.csv', '.md5'},
+         'root_macros': {'.C', '.md'},
          'vendor': {'.C', '.hh'},
          'docs': {'.pdf'}}
 

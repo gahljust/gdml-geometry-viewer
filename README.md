@@ -36,6 +36,8 @@ pasted directly. Linux dialogs use Zenity or Tk if already installed.
 | Response models | `app/responses.py`, `data/`, `vendor/` |
 | [Visual guides](docs/GUIDES.txt) (PDF) | [Loading](docs/run-flow.pdf) · [Analysis](docs/analysis-flow.pdf) · [Using the app](docs/workspace-guide.pdf) · [ROOT fields](docs/root-output-atlas.pdf) |
 
+For the standalone, single-file ROOT macro, see [root_macros/](root_macros/README.md).
+
 See [ROOT-only commands](docs/ANALYSIS.md) and
 [response origins](THIRD_PARTY.md). Bundled or local PE models are selectable.
 PE/current requires recorded detector entries; all-step files remain usable in Hits.
