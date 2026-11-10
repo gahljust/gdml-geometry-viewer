@@ -1,30 +1,30 @@
-// Standalone ROOT deconvolution. Edit fnms below, just as in develop's macro.
+// Correlated deconvolution from raw remoll ROOT files.
+// Edit fnms below: select Moller, ep-elastic and ep-inelastic files.
+// Individual filenames and wildcards are supported.
+// Inputs need the required detector entries and saved run_data metadata.
 //
-//   root -l -b -q 'deconvolution_correlated.C+()'                       // main rate + SM PE
-//   root -l -b -q 'deconvolution_correlated.C+(true)'                   // main + SM PE
-//   root -l -b -q 'deconvolution_correlated.C+(true,"/path/to/data")'   // explicit PE folder
+// Default: main-detector crossings + ShowerMax expected PE.
+//   root -l -b -q 'deconvolution_correlated.C+()'
+// For PE in both detectors, use 'deconvolution_correlated.C+(true)'.
 //
-// Raw remoll files, ROOT/ACLiC only. No viewer, Python, remoll library or
-// project headers. PE tables are NEVER embedded. usePE enables main-quartz PE;
-// useShowerMaxPE controls the existing ShowerMax response (default true).
-// Wildcards are supported; relative input paths are relative to the working directory.
-// Files are normalized separately before combining. Compatible saved run_data is required.
+// Arguments, in order:
+// 1. usePE           Main detector: false = crossings, true = expected PE.
+// 2. tableDirectory  PE CSV folder; "" searches automatically.
+// 3. output          Output ROOT filename; existing files are not overwritten.
+// 4. beamDays        Beam exposure in days (344).
+// 5. polarization    Fraction, not percent (0.8).
+// 6. current_uA      Beam current in microamps (65).
+// 7. minimumK        Crossing kinetic-energy cut in MeV (1).
+// 8. useShowerMaxPE  ShowerMax: true = expected PE, false = charged crossings.
 //
-// Rate (default): main charged entries with K >= minimumK, both directions,
-// plus forward ShowerMax expected PE, exactly as the existing rate analysis.
-// ShowerMax therefore needs external response tables in the default mode.
-// Set useShowerMaxPE=false (last argument) for pure rates without any tables;
-// that explicitly different observable does not reproduce the saved SM PE mode.
-// PE: the viewer's exact main-quartz and ShowerMax expected-PE selections/models.
-// In both modes the Ring 5 open reference retains the viewer's rate weighting.
-// The five components are Moller, ep elastic, and the three inelastic W bins.
-// Statistical and template-MC covariance are separate; C is held fixed for MC
-// propagation. Additional optical/electronics noise and model systematics are excluded.
-// Fixed-quota samples use their sibling .neyman.tsv plan and within-stratum MC
-// covariance, including zero-score histories. Companion plans are trusted inputs:
-// their MD5 must be supplied below from an independently checked generation receipt.
-// These legacy ROOT files do not authenticate the plan. Candidate and transported counts
-// are recorded separately.
+// Default mode needs ShowerMax tables. Main PE also needs its tables,
+// minimumK=1 and ShowerMax PE enabled. PE models apply additional selections.
+// Set both PE switches to false for crossing rates without tables.
+// Turning PE off does not remove detectors. See README.md for examples.
+//
+// Sum each event's signal per detector; accumulate detector-pair products
+// with one event rate weight to calculate covariance. Finite-MC error is
+// calculated separately. Additional optical/electronics/beam noise is excluded.
 //
 // Adapted directly from gahljust/gdml-geometry-viewer, commit 5077001171756458963314261943a0dddd9bfa40:
 // root/Deconvolution.C and root/root_solver.hh. The numerical solver and PE
